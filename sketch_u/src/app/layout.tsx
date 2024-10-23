@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navigation from "./_components/navigation";
+import { IBMPlexSans } from "./utils/font";
 
 export const metadata: Metadata = {
   title: "Sketch U",
   description: "Sketch your roadmap",
   icons: {
-    icon: "/cat.png",
+    icon: "/cat.jpg",
   },
 };
 
@@ -17,14 +18,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`antialiased`}
-      >
-        <div className="wrapper">
-          <Navigation></Navigation>
-          <div className="page">
-            <div className="innerContainer">
-              {children}
+      <body>
+        <div className={IBMPlexSans.className}>
+          <div className="wrapper">
+            <Navigation></Navigation>
+            <div className="page">
+              <div className="innerContainer">
+                {children}
+              </div>
             </div>
           </div>
         </div>
