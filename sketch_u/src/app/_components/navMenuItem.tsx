@@ -3,8 +3,8 @@ import styled from "styled-components";
 interface MenuItemProps {
   iconSrc: string;
   text: string;
-  isSelected: boolean;
-  onClick: () => void;
+  isselected: boolean;
+  onclick: () => void;
 }
 
 const SELECTED_COLOR = "#E8FFF7";
@@ -40,7 +40,7 @@ const MenuItemText = styled.div`
   margin-left: 9px;
 `;
 
-const MenuItemComponent: React.FC<MenuItemProps> = ({ iconSrc, text, isSelected, onClick }) => {
+const MenuItemComponent: React.FC<MenuItemProps> = ({ iconSrc, text, isselected: isSelected, onclick: onClick }) => {
   return (
     <MenuItemContainer isSelected={isSelected} onClick={onClick}>
       <IconWrapper>

@@ -23,7 +23,7 @@ const Button = styled.button`
 
 const DropdownMenu = styled.div`
   position: absolute;
-  top: 65px;
+  top: 45px;
   right: 0px;
   background-color: #ffffff;
   border: 1px solid #ddd;

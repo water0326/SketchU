@@ -70,8 +70,8 @@ export default function Navigation() {
             <MenuItemComponent
               iconSrc={item.iconSrc}
               text={item.text}
-              isSelected={index === selectedMenuIndex}
-              onClick={() => handleMenuItemClick(index, item.url)}
+              isselected={index === selectedMenuIndex}
+              onclick={() => handleMenuItemClick(index, item.url)}
             />
             {index < menuItems.length - 1 && <VerticalLine />}
           </div>
