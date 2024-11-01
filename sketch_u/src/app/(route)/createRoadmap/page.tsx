@@ -137,14 +137,14 @@ const Input = styled.input`
   padding-top: 2px;
 `;
 
-const Button = styled.button`
+const Button = styled.button<{ movedUp: boolean }>`
   background-color: #76c7c0;
   border: none;
   border-radius: 50%;
   width: 50px;
   height: 50px;
   margin-left: 19px;
-  display: flex;
+  display: ${({ movedUp }) => (movedUp ? 'none' : 'flex')};
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -153,6 +153,32 @@ const Button = styled.button`
 
   &:hover {
     background-color: #63aea6;
+  }
+`;
+
+const NewButtonsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const NewButton = styled.button<{ isResetButton?: boolean }>`
+  width: 122px;
+  height: 50px;
+  background-color: ${({ isResetButton }) => (isResetButton ? '#E9E9E9' : '#76c7c0')};
+  border: none;
+  border-radius: 25px;
+  margin-left: 17px;
+  padding: 10px 20px;
+  font-size: 17px;
+  color: #141414;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  filter: drop-shadow(1px 3px 5px rgba(0, 0, 0, 0.2));
+
+  &:hover {
+    background-color: ${({ isResetButton }) => (isResetButton ? '#d9d9d9' : '#63aea6')};
   }
 `;
 
@@ -289,9 +315,15 @@ const StudyForm: React.FC = () => {
           onKeyDown={handleKeyDown}
           placeholder=""
         />
-        <Button onClick={handleButtonClick}>
+        <Button movedUp={movedUp} onClick={handleButtonClick}>
           <img src="/icons/SendButton.svg" alt="Send" />
         </Button>
+        {movedUp && (
+        <NewButtonsContainer>
+          <NewButton isResetButton>다시 입력</NewButton>
+          <NewButton>좋아요</NewButton>
+        </NewButtonsContainer>
+      )}
       </InputWrapper>
       <EmptyBox movedUp={movedUp} />
     </StudyContainer>

@@ -26,6 +26,7 @@ const RoadMapItemContainer = styled.div<{ isEditing: boolean }>`
   height: auto;
   background-color: ${({ isEditing }) => (isEditing ? '#90D8BF' : '#f6f9f3')};
   border-radius: 13px;
+  transition: all 0.4s;
 `;
 
 const NameContainer = styled.div<{ isEditing: boolean }>`
