@@ -5,7 +5,7 @@ type RoadMapItemProps = {
   number: number;
   name: string;
   description: string;
-  isEditing: boolean;
+  $isEditing: boolean;
   onEdit: (id: number) => void;
   onConfirm: (id: number, newName: string, newDescription: string) => void;
   onCancel: (id: number) => void;
@@ -20,27 +20,27 @@ const Container = styled.div`
   margin-bottom: 15px;
 `;
 
-const RoadMapItemContainer = styled.div<{ isEditing: boolean }>`
+const RoadMapItemContainer = styled.div<{ $isEditing: boolean }>`
   width: 572px;
   min-height: 113px;
   height: auto;
-  background-color: ${({ isEditing }) => (isEditing ? '#90D8BF' : '#f6f9f3')};
+  background-color: ${({ $isEditing }) => ($isEditing ? '#90D8BF' : '#f6f9f3')};
   border-radius: 13px;
   transition: all 0.4s;
 `;
 
-const NameContainer = styled.div<{ isEditing: boolean }>`
+const NameContainer = styled.div<{ $isEditing: boolean }>`
   display: flex;
   justify-content: start;
   align-items: center;
-  margin-left: ${({ isEditing }) => (isEditing ? '10px' : '21px')};
-  margin-right: ${({ isEditing }) => (isEditing ? '10px' : '21px')};
-  margin-top: ${({ isEditing }) => (isEditing ? '10px' : '13px')};
-  margin-bottom: ${({ isEditing }) => (isEditing ? '8px' : '0px')};
+  margin-left: ${({ $isEditing }) => ($isEditing ? '10px' : '21px')};
+  margin-right: ${({ $isEditing }) => ($isEditing ? '10px' : '21px')};
+  margin-top: ${({ $isEditing }) => ($isEditing ? '10px' : '13px')};
+  margin-bottom: ${({ $isEditing }) => ($isEditing ? '8px' : '0px')};
   border-radius: 10px;
   
   width: auto;
-  background-color: ${({ isEditing }) => (isEditing ? '#FFFFFF' : 'transparent')};
+  background-color: ${({ $isEditing }) => ($isEditing ? '#FFFFFF' : 'transparent')};
 `;
 
 const ItemNumber = styled.div`
@@ -87,7 +87,7 @@ const DescContainer = styled.div`
   margin-bottom: 10px;
 `;
 
-const EditableTextArea = styled.textarea<{ isEditing: boolean }>`
+const EditableTextArea = styled.textarea<{ $isEditing: boolean }>`
   padding-left: 10px;
   padding-right: 10px;
   padding-top: 10px;
@@ -97,7 +97,7 @@ const EditableTextArea = styled.textarea<{ isEditing: boolean }>`
   color: #525252;
   font-weight: 400;
   border: none;
-  background-color: ${({ isEditing }) => (isEditing ? '#FFFFFF' : 'transparent')};
+  background-color: ${({ $isEditing }) => ($isEditing ? '#FFFFFF' : 'transparent')};
   outline: none;
   resize: none;
   border-radius: 10px;
@@ -116,7 +116,7 @@ const RoadMapItem: React.FC<RoadMapItemProps> = ({
   number,
   name,
   description,
-  isEditing,
+  $isEditing: isEditing,
   onEdit,
   onConfirm,
   onCancel,
@@ -134,8 +134,8 @@ const RoadMapItem: React.FC<RoadMapItemProps> = ({
 
   return (
     <Container>
-      <RoadMapItemContainer isEditing={isEditing}>
-        <NameContainer isEditing={isEditing}>
+      <RoadMapItemContainer $isEditing={isEditing}>
+        <NameContainer $isEditing={isEditing}>
           {!isEditing && <ItemNumber>{number}</ItemNumber>}
           {isEditing ? (
             <EditableInput value={name} onChange={(e) => onNameChange(number, e.target.value)} />
@@ -147,7 +147,7 @@ const RoadMapItem: React.FC<RoadMapItemProps> = ({
           <DescContainer>
             <EditableTextArea
               ref={textAreaRef}
-              isEditing={isEditing}
+              $isEditing={isEditing}
               value={description}
               onChange={(e) => onDescriptionChange(number, e.target.value)}
               rows={2}

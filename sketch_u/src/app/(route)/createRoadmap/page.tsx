@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 import ProfileButton from '@/app/_components/profile';
 import RoadMapItem from './roadmapItem';
 
-const StudyContainer = styled.div<{ movedUp: boolean }>`
+const StudyContainer = styled.div<{ $movedUp: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -14,14 +14,14 @@ const StudyContainer = styled.div<{ movedUp: boolean }>`
   height: 100%;
 `;
 
-const Question = styled.h2<{ movedUp: boolean }>`
+const Question = styled.h2<{ $movedUp: boolean }>`
   margin-bottom: 64px;
   font-size: 30px;
   color: #333;
   font-weight: 400;
   transition: margin-top font-size 0.6s ease;
 
-  ${({ movedUp }) =>
+  ${({ $movedUp: movedUp }) =>
     movedUp &&
     css`
       margin-bottom: 2px;
@@ -30,7 +30,7 @@ const Question = styled.h2<{ movedUp: boolean }>`
     `}
 `;
 
-const Description = styled.div<{ movedUp: boolean }>`
+const Description = styled.div<{ $movedUp: boolean }>`
   display: none;
   opacity: 0;
   width: 629px;
@@ -45,7 +45,7 @@ const Description = styled.div<{ movedUp: boolean }>`
   font-weight: 400;
   transition: opacity 1s ease;
 
-  ${({ movedUp }) =>
+  ${({ $movedUp: movedUp }) =>
     movedUp &&
     css`
       display: flex;
@@ -60,7 +60,7 @@ const DivisionLine = styled.div`
   border-radius: 100;
 `;
 
-const RoadMapContainer = styled.div<{ movedUp: boolean }>`
+const RoadMapContainer = styled.div<{ $movedUp: boolean }>`
   display: flex;
   align-items: center;
   justify-content: start;
@@ -72,7 +72,7 @@ const RoadMapContainer = styled.div<{ movedUp: boolean }>`
   scrollbar-width: thin;
   scrollbar-color: #76c7c0 transparent;
 
-  ${({ movedUp }) =>
+  ${({ $movedUp: movedUp }) =>
     movedUp &&
     css`
       display: flex;
@@ -100,22 +100,22 @@ const RoadMapContainer = styled.div<{ movedUp: boolean }>`
   }
 `;
 
-const EmptyBox = styled.div<{ movedUp: boolean }>`
+const EmptyBox = styled.div<{ $movedUp: boolean }>`
   margin-top: 94px;
-  ${({ movedUp }) =>
+  ${({ $movedUp: movedUp }) =>
     movedUp &&
     css`
       display: none;
     `}
 `;
 
-const InputWrapper = styled.div<{ movedUp: boolean }>`
+const InputWrapper = styled.div<{ $movedUp: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
   transition: margin 0.6s ease;
 
-  ${({ movedUp }) =>
+  ${({ $movedUp: movedUp }) =>
     movedUp &&
     css`
       margin-top: 81px;
@@ -137,14 +137,14 @@ const Input = styled.input`
   padding-top: 2px;
 `;
 
-const Button = styled.button<{ movedUp: boolean }>`
+const Button = styled.button<{ $movedUp: boolean }>`
   background-color: #76c7c0;
   border: none;
   border-radius: 50%;
   width: 50px;
   height: 50px;
   margin-left: 19px;
-  display: ${({ movedUp }) => (movedUp ? 'none' : 'flex')};
+  display: ${({ $movedUp: movedUp }) => (movedUp ? 'none' : 'flex')};
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -182,8 +182,8 @@ const NewButton = styled.button<{ isResetButton?: boolean }>`
   }
 `;
 
-const DraggedItem = styled.div<{ isDragging: boolean }>`
-  opacity: ${({ isDragging }) => (isDragging ? 0.5 : 1)};
+const DraggedItem = styled.div<{ $isDragging: boolean }>`
+  opacity: ${({ $isDragging }) => ($isDragging ? 0.5 : 1)};
   transition: opacity 0.2s ease;
 `;
 
@@ -275,20 +275,20 @@ const StudyForm: React.FC = () => {
   };
 
   return (
-    <StudyContainer movedUp={movedUp}>
+    <StudyContainer $movedUp={movedUp}>
       <ProfileButton />
-      <Question movedUp={movedUp}>
+      <Question $movedUp={movedUp}>
         {movedUp ? '입력하신 내용을 바탕으로 로드맵을 구성해보았어요.' : '어떤 내용에 대해서 공부하고 싶으신가요?'}
       </Question>
-      <Description movedUp={movedUp}>
+      <Description $movedUp={movedUp}>
         <div>필요에 따라 각 세션들을 편집해 보세요!</div>
         <DivisionLine />
       </Description>
-      <RoadMapContainer movedUp={movedUp}>
+      <RoadMapContainer $movedUp={movedUp}>
         {roadmapItems.map((item, index) => (
           <DraggedItem
             key={item.number}
-            isDragging={draggingIndex === index}
+            $isDragging={draggingIndex === index}
             draggable
             onDragStart={(e) => handleDragStart(e, index)}
             onDragOver={(e) => handleDragOver(e, index)}
@@ -298,7 +298,7 @@ const StudyForm: React.FC = () => {
               number={item.number}
               name={item.name}
               description={item.description}
-              isEditing={item.isEditing}
+              $isEditing={item.isEditing}
               onEdit={handleEdit}
               onConfirm={handleConfirm}
               onCancel={handleCancel}
@@ -308,14 +308,14 @@ const StudyForm: React.FC = () => {
           </DraggedItem>
         ))}
       </RoadMapContainer>
-      <InputWrapper movedUp={movedUp}>
+      <InputWrapper $movedUp={movedUp}>
         <Input
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder=""
         />
-        <Button movedUp={movedUp} onClick={handleButtonClick}>
+        <Button $movedUp={movedUp} onClick={handleButtonClick}>
           <img src="/icons/SendButton.svg" alt="Send" />
         </Button>
         {movedUp && (
@@ -325,7 +325,7 @@ const StudyForm: React.FC = () => {
         </NewButtonsContainer>
       )}
       </InputWrapper>
-      <EmptyBox movedUp={movedUp} />
+      <EmptyBox $movedUp={movedUp} />
     </StudyContainer>
   );
 };

@@ -7,7 +7,7 @@ import RoadmapCard from './roadmapCard';
 const Roadmap: React.FC = () => {
   return (
     <Container>
-      <Header>내 로드맵</Header>
+      <PageName>내 로드맵</PageName>
       <Controls>
         <SortContainer>
           정렬 :
@@ -68,11 +68,11 @@ const Container = styled.div`
   padding: 24px;
 `;
 
-const Header = styled.h1`
-  font-size: 24px;
+const PageName = styled.div`
+  font-size: 40px;
+  font-weight: 600;
   margin-bottom: 16px;
-  font-weight: 700;
-`;
+`;  
 
 const Controls = styled.div`
   display: flex;

@@ -1,14 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
   const router = useRouter();
 
-  const goToCreateRoadMap = () => {
+  useEffect(() => {
     router.push('/createRoadmap');
-  };
-  return (
-    <button onClick={goToCreateRoadMap}>이동</button>
-  );
+  }, [router]);
+
+  return null;
 }

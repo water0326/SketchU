@@ -9,19 +9,19 @@ interface MenuItemProps {
 
 const SELECTED_COLOR = "#E8FFF7";
 
-const MenuItemContainer = styled.div<{ isSelected: boolean }>`
+const MenuItemContainer = styled.div<{ $isSelected: boolean }>`
   display: flex;
   align-items: center;
   cursor: pointer;
   width: 191px;
   height: 48px;
-  background-color: ${(props) => (props.isSelected ? SELECTED_COLOR : "#e8fff700")};
+  background-color: ${(props) => (props.$isSelected ? SELECTED_COLOR : "#e8fff700")};
   border-radius: 50px;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
   color: #1a1a1a;
   &:hover {
-    background-color: ${(props) => (props.isSelected ? SELECTED_COLOR : "#e8fff7aa")};
-    color: ${(props) => (props.isSelected ? "#1a1a1a" : "#000000")};
+    background-color: ${(props) => (props.$isSelected ? SELECTED_COLOR : "#e8fff7aa")};
+    color: ${(props) => (props.$isSelected ? "#1a1a1a" : "#000000")};
   }
 `;
 
@@ -42,7 +42,7 @@ const MenuItemText = styled.div`
 
 const MenuItemComponent: React.FC<MenuItemProps> = ({ iconSrc, text, isselected: isSelected, onclick: onClick }) => {
   return (
-    <MenuItemContainer isSelected={isSelected} onClick={onClick}>
+    <MenuItemContainer $isSelected={isSelected} onClick={onClick}>
       <IconWrapper>
         <img src={iconSrc} alt="" />
       </IconWrapper>

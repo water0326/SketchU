@@ -2,8 +2,8 @@
 
 import styled from "styled-components";
 import MenuItemComponent from "./navMenuItem";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 
 const Container = styled.div`
   min-width: 300px;
@@ -21,9 +21,9 @@ const Container = styled.div`
 const Logo = styled.div`
   font-size: 24px;
   font-weight: bold;
-  margin-top: 65px;
-  margin-bottom: 131px;
-  width: 149px;
+  margin-top: 55px;
+  margin-bottom: 141px;
+  width: 229px;
   height: 99px;
   text-align: center;
   vertical-align: middle;
@@ -48,13 +48,21 @@ const VerticalLine = styled.div`
 
 export default function Navigation() {
   const router = useRouter();
+  const pathname = usePathname();
   const [selectedMenuIndex, setSelectedMenuIndex] = useState(0);
 
   const menuItems = [
-    { iconSrc: "/icons/Puzzle.svg", text: "로드맵", url: "/roadmap" },
+    { iconSrc: "/icons/Puzzle.svg", text: "로드맵", url: "/roadmapList" },
     { iconSrc: "/icons/Calendar.svg", text: "캘린더", url: "/calendar" },
     { iconSrc: "/icons/Setting.svg", text: "설정", url: "/settings" }
   ];
+
+  useEffect(() => {
+    const currentIndex = menuItems.findIndex(item => pathname.startsWith(item.url));
+    if (currentIndex !== -1) {
+      setSelectedMenuIndex(currentIndex);
+    }
+  }, [pathname]);
 
   const handleMenuItemClick = (index: number, url: string) => {
     setSelectedMenuIndex(index);
@@ -63,7 +71,7 @@ export default function Navigation() {
 
   return (
     <Container>
-      <Logo>LOGO</Logo>
+      <Logo><img src="/icons/Logo.png" alt="LOGO" /></Logo>
       <Menu>
         {menuItems.map((item, index) => (
           <div key={item.text}>
