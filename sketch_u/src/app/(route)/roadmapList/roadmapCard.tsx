@@ -1,6 +1,9 @@
 // components/RoadmapCard.tsx
+"use client";
+
 import React from 'react';
 import styled from 'styled-components';
+import { useRouter } from 'next/navigation';
 
 type RoadmapCardProps = {
   title: string;
@@ -9,6 +12,7 @@ type RoadmapCardProps = {
   daysLeft: number;
   progress: number;
   maxProgress: number;
+  roadmapId: number;
 };
 
 const RoadmapCard: React.FC<RoadmapCardProps> = ({
@@ -18,9 +22,26 @@ const RoadmapCard: React.FC<RoadmapCardProps> = ({
   daysLeft,
   progress,
   maxProgress,
+  roadmapId,
 }) => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    const queryString = new URLSearchParams({
+      roadmapId: roadmapId.toString(),
+      title,
+      subtitle,
+      category,
+      daysLeft: daysLeft.toString(),
+      progress: progress.toString(),
+      maxProgress: maxProgress.toString(),
+    }).toString();
+
+    router.push(`/roadmap?${queryString}`);
+  };
+
   return (
-    <Card>
+    <Card onClick={handleClick}>
       <ProgressBar>
         {Array.from({ length: maxProgress }, (_, index) => (
           <ProgressIndicator key={index} active={index < progress} />

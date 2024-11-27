@@ -2,6 +2,7 @@
   
 import styled from 'styled-components';
 import React, { useState } from 'react';
+import ProfileButton from '@/app/_components/profile';
 
 const Container = styled.div`
   width: 100%;
@@ -540,6 +541,7 @@ export default function HomePage() {
 
   return (
     <Container>
+      <ProfileButton />
       <PageName>내 로드맵</PageName>
       <ContentContainer>
         <Sidebar>
