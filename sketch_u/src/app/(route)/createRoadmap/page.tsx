@@ -196,23 +196,23 @@ const DUMMY_ROADMAP_DATA = [
     topic: 'Understanding Basics',
     description: 'Learn fundamental concepts and terminology',
     start_date: '2024-03-20',
-    deadline: '2024-03-27',
+    deadline: '2024-03-21',
     note: 'Focus on core principles'
   },
   {
     seq: 2,
     topic: 'Practical Applications',
     description: 'Apply concepts through hands-on exercises',
-    start_date: '2024-03-28',
-    deadline: '2024-04-04',
+    start_date: '2024-03-22',
+    deadline: '2024-04-24',
     note: 'Complete practice projects'
   },
   {
     seq: 3,
     topic: 'Advanced Concepts',
     description: 'Explore advanced topics and best practices',
-    start_date: '2024-04-05',
-    deadline: '2024-04-12',
+    start_date: '2024-04-25',
+    deadline: '2024-04-30',
     note: 'Deep dive into complex scenarios'
   }
 ];
@@ -288,23 +288,26 @@ const adjustDates = (items: any[]) => {
   return items.map((item, index) => {
     if (!item.startDate || !item.deadline) return item;
 
-    // 현재 아이템의 기간 계산
-    const duration = getDaysDifference(item.startDate, item.deadline);
-    
     if (index === 0) {
-      // 첫 번째 아이템은 시작일만 확인
+      // 첫 번째 아이템은 시작일과 종료일만 확인
       if (new Date(item.startDate) > new Date(item.deadline)) {
-        item.deadline = addDays(item.startDate, duration);
+        item.deadline = addDays(item.startDate, getDaysDifference(item.startDate, item.deadline));
       }
-    } else {
-      // 이전 아이템의 마감일 다음 날을 시작일로
-      const prevItem = items[index - 1];
-      if (prevItem.deadline) {
-        const newStartDate = addDays(prevItem.deadline, 1);
-        item.startDate = newStartDate;
-        item.deadline = addDays(newStartDate, duration);
-      }
+      return item;
     }
+
+    // 이전 아이템과 현재 아이템의 날짜가 겹치는지 확인
+    const prevItem = items[index - 1];
+    const currentStart = new Date(item.startDate);
+    const prevEnd = new Date(prevItem.deadline);
+
+    // 날짜가 겹치는 경우에만 조정
+    if (currentStart <= prevEnd) {
+      const duration = getDaysDifference(item.startDate, item.deadline);
+      item.startDate = addDays(prevItem.deadline, 1);
+      item.deadline = addDays(item.startDate, duration);
+    }
+
     return item;
   });
 };
@@ -320,6 +323,28 @@ const addDays = (date: string, days: number) => {
   result.setDate(result.getDate() + days);
   return result.toISOString().split('T')[0];
 };
+
+const StartDateContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  color: #383838;
+`;
+
+const StartDateInput = styled.input`
+  padding: 5px 10px;
+  border: 1px solid #76c7c0;
+  border-radius: 5px;
+  font-size: 16px;
+  color: #383838;
+  
+  &:focus {
+    outline: none;
+    border-color: #63aea6;
+  }
+`;
 
 const StudyForm: React.FC = () => {
   const [movedUp, setMovedUp] = useState(false);
@@ -340,6 +365,19 @@ const StudyForm: React.FC = () => {
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const router = useRouter();
   const [roadmapName, setRoadmapName] = useState('');
+  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [originalValues, setOriginalValues] = useState<{
+    items: Array<{
+      number: number;
+      name: string;
+      description: string;
+      startDate: string;
+      deadline: string;
+      isEditing: boolean;
+      note: string;
+    }>;
+    editingId?: number;
+  }>({ items: [] });
 
   const handleButtonClick = async () => {
     if (inputValue.trim() === '') return;
@@ -405,6 +443,11 @@ const StudyForm: React.FC = () => {
   };
 
   const handleEdit = (id: number) => {
+    setOriginalValues({
+      items: [...roadmapItems],
+      editingId: id
+    });
+    
     setRoadmapItems((items) =>
       items.map((item) =>
         item.number === id ? { ...item, isEditing: true } : item
@@ -423,11 +466,14 @@ const StudyForm: React.FC = () => {
   };
 
   const handleCancel = (id: number) => {
-    setRoadmapItems((items) =>
-      items.map((item) =>
-        item.number === id ? { ...item, isEditing: false } : item
-      )
-    );
+    if (originalValues.items.length > 0) {
+      setRoadmapItems(originalValues.items.map(item => ({
+        ...item,
+        isEditing: false
+      })));
+    }
+    
+    setOriginalValues({ items: [] });
   };
 
   const handleNameChange = (id: number, newName: string) => {
@@ -459,13 +505,25 @@ const StudyForm: React.FC = () => {
     const [draggedItem] = updatedItems.splice(draggingIndex, 1);
     updatedItems.splice(overIndex, 0, draggedItem);
 
-    // 순서가 변경된 후 날짜 조정
-    const adjustedItems = adjustDates(
-      updatedItems.map((item, idx) => ({ ...item, number: idx + 1 }))
-    );
+    // 첫 번째 아이템의 시작일을 전체 로드맵 시작일로 설정
+    const adjustedItems = updatedItems.map((item, idx) => {
+      if (idx === 0) {
+        const duration = item.deadline ? getDaysDifference(item.startDate || startDate, item.deadline) : 7;
+        return {
+          ...item,
+          number: idx + 1,
+          startDate: startDate,
+          deadline: addDays(startDate, duration)
+        };
+      }
+      return { ...item, number: idx + 1 };
+    });
+
+    // 순서가 변경된 후 나머지 아이템들의 날짜 조정
+    const finalItems = adjustDates(adjustedItems);
 
     setDraggingIndex(overIndex);
-    setRoadmapItems(adjustedItems);
+    setRoadmapItems(finalItems);
   };
 
   const handleDrop = () => {
@@ -531,7 +589,35 @@ const StudyForm: React.FC = () => {
       return item;
     });
 
-    // 날짜 변경 후 전체 로드맵 날짜 조정
+    // 날짜 순서대로 정렬
+    const sortedItems = [...updatedItems].sort((a, b) => 
+      new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+    );
+
+    // 겹치는 날짜가 있는 경우에만 조정
+    const adjustedItems = adjustDates(sortedItems);
+    setRoadmapItems(adjustedItems);
+  };
+
+  // 전체 로드맵 시작일 변경 핸들러
+  const handleRoadmapStartDateChange = (newStartDate: string) => {
+    setStartDate(newStartDate);
+    
+    // 각 아이템의 기간을 유지하면서 날짜 조정
+    const updatedItems = roadmapItems.map((item, index) => {
+      if (index === 0) {
+        // 첫 번째 아이템의 시작일을 새로운 시작일로 설정
+        const duration = item.deadline ? getDaysDifference(item.startDate || newStartDate, item.deadline) : 7;
+        return {
+          ...item,
+          startDate: newStartDate,
+          deadline: addDays(newStartDate, duration)
+        };
+      }
+      return item;
+    });
+
+    // 전체 로드맵 날짜 재조정
     const adjustedItems = adjustDates(updatedItems);
     setRoadmapItems(adjustedItems);
   };
@@ -559,6 +645,14 @@ const StudyForm: React.FC = () => {
             onChange={(e) => setRoadmapName(e.target.value)}
             placeholder="로드맵 제목을 입력하세요"
           />
+          <StartDateContainer>
+            <span>로드맵 시작일:</span>
+            <StartDateInput
+              type="date"
+              value={startDate}
+              onChange={(e) => handleRoadmapStartDateChange(e.target.value)}
+            />
+          </StartDateContainer>
         </>
       )}
       <RoadMapContainer $movedUp={movedUp}>

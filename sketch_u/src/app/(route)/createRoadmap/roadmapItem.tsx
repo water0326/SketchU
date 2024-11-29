@@ -174,8 +174,6 @@ const RoadMapItem: React.FC<RoadMapItemProps> = ({
   };
 
   const handleCancel = (id: number) => {
-    onNameChange(id, originalName);
-    onDescriptionChange(id, originalDescription);
     onCancel(id);
   };
 
