@@ -3,6 +3,7 @@
 import styled from 'styled-components';
 import React, { useState } from 'react';
 import ProfileButton from '@/app/_components/profile';
+import NewRoadmap from '@/app/_components/newRoadmap';
 
 const Container = styled.div`
   width: 100%;
@@ -214,6 +215,12 @@ const SessionItem = styled.li<{ status: 'completed' | 'current' | 'upcoming'; se
     flex-direction: column;
     box-shadow: ${props => props.selected ? '0px 4px 5px rgba(0, 0, 0, 0.25)' : 'none'};
     position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+    }
 `;
 
 const SessionTitleContainer = styled.div`
@@ -324,6 +331,51 @@ const ModalButton = styled.button`
   }
 `;
 
+const DateContainer = styled.div`
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+  color: #525252;
+  font-size: 16px;
+  font-weight: 400;
+`;
+
+const DateLabel = styled.span`
+  color: #3C3C3C;
+  font-weight: 600;
+`;
+
+const CancelEditButton = styled.span`
+  cursor: pointer;
+  padding: 5px;
+  
+  img {
+    filter: invert(63%) sepia(54%) saturate(7483%) hue-rotate(325deg) brightness(101%) contrast(101%);
+  }
+  
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+const TooltipContainer = styled.div<{ isVisible: boolean; isError?: boolean }>`
+  position: fixed;
+  background: ${props => props.isError ? '#FF9494' : '#FFFFFF'};
+  color: ${props => props.isError ? '#FFFFFF' : '#3C3C3C'};
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  z-index: 1000;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: ${props => props.isVisible ? 1 : 0};
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.15));
+`;
+
 interface UserEntity {
   id: number;
   username: string;
@@ -351,12 +403,37 @@ interface RoadmapData {
   sessionData: SessionData;
 }
 
+// API 호출을 위한 함수 추가
+const updateRoadmap = async (updatedData: RoadmapData) => {
+  try {
+    const response = await fetch('/roadmap/updateroadmap', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // 액세스 토큰 추가
+      },
+      body: JSON.stringify(updatedData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+  } catch (error) {
+    console.error('로드맵 업데이트 실패:', error);
+  }
+};
+
 export default function HomePage() {
   const [selectedSession, setSelectedSession] = useState<number | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedTopic, setEditedTopic] = useState('');
   const [editedDescription, setEditedDescription] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [editedStartDate, setEditedStartDate] = useState('');
+  const [editedDeadline, setEditedDeadline] = useState('');
+  const [tooltipMessage, setTooltipMessage] = useState('');
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const initialRoadmapData: RoadmapData = {
     roadmapId: 1,
@@ -423,34 +500,133 @@ export default function HomePage() {
 
   const [roadmapData, setRoadmapData] = useState<RoadmapData>(initialRoadmapData);
 
-  const handleNoteChange = (note: string) => {
+  // handleNoteChange 함수 수정
+  const handleNoteChange = async (note: string) => {
     if (selectedSession === null) return;
     
-    setRoadmapData(prev => {
-      const newData = { ...prev };
-      newData.sessionData.result[selectedSession].note = note;
-      return newData;
-    });
+    const newData = {
+      ...roadmapData,
+      sessionData: {
+        ...roadmapData.sessionData,
+        result: roadmapData.sessionData.result.map((session, index) => 
+          index === selectedSession ? { ...session, note } : session
+        )
+      }
+    };
+    
+    setRoadmapData(newData);
+    await updateRoadmap(newData);
   };
 
   const handleEditClick = () => {
     if (selectedSession !== null) {
       setEditedTopic(roadmapData.sessionData.result[selectedSession].topic);
       setEditedDescription(roadmapData.sessionData.result[selectedSession].description);
+      setEditedStartDate(roadmapData.sessionData.result[selectedSession].start_date);
+      setEditedDeadline(roadmapData.sessionData.result[selectedSession].deadline);
       setIsEditing(true);
     }
   };
 
-  const handleSaveEdit = () => {
+  const showTooltipMessage = (message: string, isError: boolean = false) => {
+    setTooltipMessage(message);
+    setShowTooltip(true);
+    setTimeout(() => setShowTooltip(false), 3000);
+  };
+
+  // handleSaveEdit 함수 수정
+  const handleSaveEdit = async () => {
     if (selectedSession === null) return;
     
-    setRoadmapData(prev => {
-      const newData = { ...prev };
-      newData.sessionData.result[selectedSession].topic = editedTopic;
-      newData.sessionData.result[selectedSession].description = editedDescription;
-      return newData;
-    });
+    if (new Date(editedStartDate) > new Date(editedDeadline)) {
+      showTooltipMessage('시작일은 마감일보다 늦을 수 없습니다.', true);
+      return;
+    }
+
+    let updatedSessions = [...roadmapData.sessionData.result];
+    let adjustmentsMade = false;
+
+    // 이전 세션들 재귀적 조정
+    const adjustPreviousSessions = (currentIndex: number, newDeadline: string) => {
+      if (currentIndex <= 0) return;
+      
+      const prevSession = updatedSessions[currentIndex - 1];
+      const prevDeadline = new Date(prevSession.deadline);
+      const newDeadlineDate = new Date(newDeadline);
+      
+      if (prevDeadline > newDeadlineDate) {
+        // 새로운 시작일 계산 (마감일과 동일한 간격 유지)
+        const originalDuration = prevDeadline.getTime() - new Date(prevSession.start_date).getTime();
+        const newStartDate = new Date(newDeadlineDate.getTime() - originalDuration);
+        
+        updatedSessions[currentIndex - 1] = {
+          ...prevSession,
+          start_date: newStartDate.toISOString().split('T')[0],
+          deadline: newDeadline
+        };
+        adjustmentsMade = true;
+        
+        // 이전 세션의 시작일이 그 이전 세션의 마감일보다 앞서면 재귀 호출
+        adjustPreviousSessions(currentIndex - 1, newStartDate.toISOString().split('T')[0]);
+      }
+    };
+
+    // 다음 세션들 재귀적 조정
+    const adjustNextSessions = (currentIndex: number, newStartDate: string) => {
+      if (currentIndex >= updatedSessions.length - 1) return;
+      
+      const nextSession = updatedSessions[currentIndex + 1];
+      const nextStartDate = new Date(nextSession.start_date);
+      const newStartDateObj = new Date(newStartDate);
+      
+      if (nextStartDate < newStartDateObj) {
+        // 새로운 마감일 계산 (시작일과 동일한 간격 유지)
+        const originalDuration = new Date(nextSession.deadline).getTime() - nextStartDate.getTime();
+        const newDeadline = new Date(newStartDateObj.getTime() + originalDuration);
+        
+        updatedSessions[currentIndex + 1] = {
+          ...nextSession,
+          start_date: newStartDate,
+          deadline: newDeadline.toISOString().split('T')[0]
+        };
+        adjustmentsMade = true;
+        
+        // 다음 세션의 마감일이 그 다음 세션의 시작일보다 늦으면 재귀 호출
+        adjustNextSessions(currentIndex + 1, newDeadline.toISOString().split('T')[0]);
+      }
+    };
+
+    // 이전 세션들 조정
+    adjustPreviousSessions(selectedSession, editedStartDate);
+
+    // 다음 세션들 조정
+    adjustNextSessions(selectedSession, editedDeadline);
+
+    // 현재 세션 업데이트
+    updatedSessions[selectedSession] = {
+      ...updatedSessions[selectedSession],
+      topic: editedTopic,
+      description: editedDescription,
+      start_date: editedStartDate,
+      deadline: editedDeadline
+    };
+
+    const newData = {
+      ...roadmapData,
+      sessionData: {
+        ...roadmapData.sessionData,
+        result: updatedSessions
+      }
+    };
+
+    setRoadmapData(newData);
     setIsEditing(false);
+
+    if (adjustmentsMade) {
+      showTooltipMessage('인접한 세션들의 날짜를 앞당기거나 미루었습니다.');
+    }
+
+    await updateRoadmap(newData);
   };
 
   const handleSessionComplete = () => {
@@ -542,6 +718,8 @@ export default function HomePage() {
   return (
     <Container>
       <ProfileButton />
+      <NewRoadmap />
+
       <PageName>내 로드맵</PageName>
       <ContentContainer>
         <Sidebar>
@@ -591,9 +769,20 @@ export default function HomePage() {
                 </CloseIcon>
                 <HeaderIcons>
                   {isEditing ? (
-                    <span onClick={handleSaveEdit}>
-                      <img src="/icons/save.svg" alt="save" />
-                    </span>
+                    <>
+                      <CancelEditButton onClick={() => {
+                        setIsEditing(false);
+                        setEditedTopic(roadmapData.sessionData.result[selectedSession].topic);
+                        setEditedDescription(roadmapData.sessionData.result[selectedSession].description);
+                        setEditedStartDate(roadmapData.sessionData.result[selectedSession].start_date);
+                        setEditedDeadline(roadmapData.sessionData.result[selectedSession].deadline);
+                      }}>
+                        <img src="/icons/cancel.svg" alt="cancel" />
+                      </CancelEditButton>
+                      <span onClick={handleSaveEdit}>
+                        <img src="/icons/save.svg" alt="save" />
+                      </span>
+                    </>
                   ) : (
                     <>
                       <span onClick={handleAddSession}>
@@ -627,6 +816,46 @@ export default function HomePage() {
                     roadmapData.sessionData.result[selectedSession].topic
                   )}
                 </HeaderTitle>
+                <DateContainer>
+                  <div>
+                    <DateLabel>시작일: </DateLabel>
+                    {isEditing ? (
+                      <input
+                        type="date"
+                        value={editedStartDate}
+                        onChange={(e) => setEditedStartDate(e.target.value)}
+                        style={{
+                          border: 'none',
+                          background: '#FFFFFF',
+                          padding: '2px 5px',
+                          borderRadius: '4px',
+                          fontSize: '16px'
+                        }}
+                      />
+                    ) : (
+                      roadmapData.sessionData.result[selectedSession].start_date
+                    )}
+                  </div>
+                  <div>
+                    <DateLabel>마감일: </DateLabel>
+                    {isEditing ? (
+                      <input
+                        type="date"
+                        value={editedDeadline}
+                        onChange={(e) => setEditedDeadline(e.target.value)}
+                        style={{
+                          border: 'none',
+                          background: '#FFFFFF',
+                          padding: '2px 5px',
+                          borderRadius: '4px',
+                          fontSize: '16px'
+                        }}
+                      />
+                    ) : (
+                      roadmapData.sessionData.result[selectedSession].deadline
+                    )}
+                  </div>
+                </DateContainer>
               </ContentHeader>
               <ContentBody>
                 {isEditing ? (
@@ -689,6 +918,12 @@ export default function HomePage() {
           </ModalContent>
         </Modal>
       )}
+      <TooltipContainer 
+        isVisible={showTooltip} 
+        isError={tooltipMessage === '시작일은 마감일보다 늦을 수 없습니다.'}
+      >
+        {tooltipMessage}
+      </TooltipContainer>
     </Container>
   );
 }

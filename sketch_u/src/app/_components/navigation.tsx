@@ -28,6 +28,7 @@ const Logo = styled.div`
   text-align: center;
   vertical-align: middle;
   font-size: 40px;
+  cursor: pointer;
 `;
 
 const Menu = styled.div`
@@ -58,9 +59,16 @@ export default function Navigation() {
   ];
 
   useEffect(() => {
-    const currentIndex = menuItems.findIndex(item => pathname.startsWith(item.url));
-    if (currentIndex !== -1) {
-      setSelectedMenuIndex(currentIndex);
+    const roadmapRoutes = ['/roadmapList', '/roadmap', '/createRoadmap'];
+    const isRoadmapRoute = roadmapRoutes.some(route => pathname.startsWith(route));
+    
+    if (isRoadmapRoute) {
+      setSelectedMenuIndex(0);
+    } else {
+      const currentIndex = menuItems.findIndex(item => pathname.startsWith(item.url));
+      if (currentIndex !== -1) {
+        setSelectedMenuIndex(currentIndex);
+      }
     }
   }, [pathname]);
 
@@ -69,9 +77,16 @@ export default function Navigation() {
     router.push(url);
   };
 
+  const handleLogoClick = () => {
+    router.push('/roadmapList');
+    setSelectedMenuIndex(0);
+  };
+
   return (
     <Container>
-      <Logo><img src="/icons/Logo.png" alt="LOGO" /></Logo>
+      <Logo onClick={handleLogoClick}>
+        <img src="/icons/Logo.png" alt="LOGO" />
+      </Logo>
       <Menu>
         {menuItems.map((item, index) => (
           <div key={item.text}>

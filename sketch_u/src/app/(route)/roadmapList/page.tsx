@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import RoadmapCard from './roadmapCard';
 import { useRouter } from 'next/navigation';
 import ProfileButton from '@/app/_components/profile';
+import NewRoadmap from '@/app/_components/newRoadmap';
 
 // RoadmapData 인터페이스 추가
 interface TimelineItem {
@@ -206,6 +207,7 @@ const Roadmap: React.FC = () => {
     <Container>
       <ProfileButton />
       <PageName>내 로드맵</PageName>
+      <NewRoadmap />
       <Controls>
         <SortContainer>
           정렬 :

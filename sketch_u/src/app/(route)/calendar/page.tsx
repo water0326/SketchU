@@ -1,5 +1,6 @@
 'use client'
 
+import NewRoadmap from '@/app/_components/newRoadmap'
 import ProfileButton from '@/app/_components/profile'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
@@ -177,8 +178,8 @@ export default function Timeline() {
               seq: 1,
               topic: "Python 설치하기",
               description: "Python 공식 웹사이트에서 최신 버전을 다운로드하고 설치하세요.",
-              start_date: "2024-11-28",
-              deadline: "2024-12-03",
+              start_date: "2024-11-26",
+              deadline: "2024-12-01",
               note: null
             },
             {
@@ -270,6 +271,7 @@ export default function Timeline() {
 
   return (
     <TimelineContainer>
+      <NewRoadmap />
       <ProfileButton />
       <PageName>캘린더</PageName>
       <ZoomControls>
@@ -307,8 +309,22 @@ export default function Timeline() {
                   const duration = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
                   const isLastItem = index === timeline.sessionData.result.length - 1;
 
+                  // 다음 세션과의 간격 계산
+                  let gapToNextSession = 0;
+                  if (!isLastItem) {
+                    const nextSessionStart = new Date(timeline.sessionData.result[index + 1].start_date);
+                    const currentSessionEnd = new Date(item.deadline);
+                    gapToNextSession = Math.ceil((nextSessionStart.getTime() - currentSessionEnd.getTime()) / (1000 * 60 * 60 * 24));
+                  }
+
                   return (
-                    <TimelineItem key={item.seq} index={index}>
+                    <TimelineItem 
+                      key={item.seq} 
+                      index={index}
+                      style={{
+                        marginRight: `${gapToNextSession * dayWidth - 20}px` // 기본 -20px 마진에 간격 추가
+                      }}
+                    >
                       <DateContainer>
                         <StartDate>{startDate.getMonth() + 1}/{startDate.getDate()}</StartDate>
                         {isLastItem && <EndDate>{endDate.getMonth() + 1}/{endDate.getDate()}</EndDate>}
@@ -470,10 +486,7 @@ const TimelineCard = styled.div<{
         return '#F2F2F2';
     }
   }};
-  border-top-right-radius: 100px;
-  border-bottom-right-radius: 100px;
-  border-top-left-radius: ${props => props.$seq === 1 ? '100px' : '0'};
-  border-bottom-left-radius: ${props => props.$seq === 1 ? '100px' : '0'};
+  border-radius: 100px;
   width: ${props => props.$duration * props.$dayWidth}px;
   height: 40px;
   padding: 12px;
@@ -509,8 +522,8 @@ const TimelineCard = styled.div<{
 `
 
 const CardTitle = styled.h3`
-  margin-left: 20px;
-  font-size: 21px;
+  margin-left: 15px;
+  font-size: 17px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -613,7 +626,7 @@ const CurrentDateLine = styled.div`
   bottom: 0;
   width: 2px;
   background-color: #FF4444;
-  z-index: 1000;
+  z-index: 2000;
   pointer-events: none;
 
   &::after {
@@ -637,7 +650,7 @@ const Tooltip = styled.div`
   border-radius: 8px;
   padding: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
+  z-index: 3000;
   min-width: 280px;
   max-width: 360px;
   pointer-events: none;

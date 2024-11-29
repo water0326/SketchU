@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 type RoadMapItemProps = {
@@ -11,22 +11,30 @@ type RoadMapItemProps = {
   onCancel: (id: number) => void;
   onNameChange: (id: number, newName: string) => void;
   onDescriptionChange: (id: number, newDescription: string) => void;
+  startDate: string;
+  deadline: string;
+  onStartDateChange?: (id: number, date: string) => void;
+  onDeadlineChange?: (id: number, date: string) => void;
 };
 
 const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f0f4f8;
+  border-radius: 15px;
 `;
 
 const RoadMapItemContainer = styled.div<{ $isEditing: boolean }>`
-  width: 572px;
-  min-height: 113px;
+  width: 600px;
+  min-height: 120px;
   height: auto;
-  background-color: ${({ $isEditing }) => ($isEditing ? '#90D8BF' : '#f6f9f3')};
-  border-radius: 13px;
-  transition: all 0.4s;
+  background-color: ${({ $isEditing }) => ($isEditing ? '#e0f7fa' : '#ffffff')};
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 `;
 
 const NameContainer = styled.div<{ $isEditing: boolean }>`
@@ -44,28 +52,26 @@ const NameContainer = styled.div<{ $isEditing: boolean }>`
 `;
 
 const ItemNumber = styled.div`
-  font-size: 26px;
-  font-weight: 600;
-  color: #272727;
-  margin-right: 7px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin-right: 10px;
 `;
 
 const ItemName = styled.div`
-  font-size: 23px;
-  font-weight: 600;
-  color: #272727;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
 `;
 
 const EditableInput = styled.input`
-  padding-left: 10px;
-  padding-top: 10px;
-  padding-right: 10px;
-  padding-bottom: 10px;
+  padding: 12px;
   width: 100%;
-  font-size: 23px;
-  font-weight: 600;
-  color: #272727;
-  border: none;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 8px;
   background-color: transparent;
   outline: none;
 `;
@@ -88,16 +94,13 @@ const DescContainer = styled.div`
 `;
 
 const EditableTextArea = styled.textarea<{ $isEditing: boolean }>`
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding: 12px;
   width: 100%;
   font-size: 18px;
-  color: #525252;
+  color: #555;
   font-weight: 400;
-  border: none;
-  background-color: ${({ $isEditing }) => ($isEditing ? '#FFFFFF' : 'transparent')};
+  border: 1px solid #ddd;
+  background-color: ${({ $isEditing }) => ($isEditing ? '#ffffff' : 'transparent')};
   outline: none;
   resize: none;
   border-radius: 10px;
@@ -112,6 +115,32 @@ const ItemImage = styled.img`
   cursor: pointer;
 `;
 
+const DateContainer = styled.div`
+  display: flex;
+  gap: 20px;
+  margin-left: 21px;
+  margin-bottom: 8px;
+`;
+
+const DateInfo = styled.div`
+  font-size: 14px;
+  color: #666;
+`;
+
+const DateInput = styled.input`
+  padding: 5px;
+  margin: 0 5px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: white;
+  font-size: 14px;
+  color: #666;
+
+  &:invalid {
+    border-color: #ff6b6b;
+  }
+`;
+
 const RoadMapItem: React.FC<RoadMapItemProps> = ({
   number,
   name,
@@ -122,8 +151,14 @@ const RoadMapItem: React.FC<RoadMapItemProps> = ({
   onCancel,
   onNameChange,
   onDescriptionChange,
+  startDate,
+  deadline,
+  onStartDateChange,
+  onDeadlineChange,
 }) => {
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+  const [originalName, setOriginalName] = useState(name);
+  const [originalDescription, setOriginalDescription] = useState(description);
 
   useEffect(() => {
     if (textAreaRef.current) {
@@ -131,6 +166,35 @@ const RoadMapItem: React.FC<RoadMapItemProps> = ({
       textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
     }
   }, [isEditing]);
+
+  const handleEdit = (id: number) => {
+    setOriginalName(name);
+    setOriginalDescription(description);
+    onEdit(id);
+  };
+
+  const handleCancel = (id: number) => {
+    onNameChange(id, originalName);
+    onDescriptionChange(id, originalDescription);
+    onCancel(id);
+  };
+
+  const validateDate = (date: string, isStart: boolean) => {
+    if (!date) return;
+    
+    if (isStart && deadline) {
+      // 시작일이 마감일보다 늦을 수 없음
+      if (new Date(date) > new Date(deadline)) {
+        return false;
+      }
+    } else if (!isStart && startDate) {
+      // 마감일이 시작일보다 빠를 수 없음
+      if (new Date(date) < new Date(startDate)) {
+        return false;
+      }
+    }
+    return true;
+  };
 
   return (
     <Container>
@@ -156,13 +220,45 @@ const RoadMapItem: React.FC<RoadMapItemProps> = ({
         ) : (
           <ItemDescription>{description}</ItemDescription>
         )}
+        <DateContainer>
+          <DateInfo>
+            시작일: {isEditing ? (
+              <DateInput
+                type="date"
+                value={startDate}
+                onChange={(e) => {
+                  if (validateDate(e.target.value, true)) {
+                    onStartDateChange && onStartDateChange(number, e.target.value);
+                  }
+                }}
+              />
+            ) : (
+              startDate
+            )}
+          </DateInfo>
+          <DateInfo>
+            마감일: {isEditing ? (
+              <DateInput
+                type="date"
+                value={deadline}
+                onChange={(e) => {
+                  if (validateDate(e.target.value, false)) {
+                    onDeadlineChange && onDeadlineChange(number, e.target.value);
+                  }
+                }}
+              />
+            ) : (
+              deadline
+            )}
+          </DateInfo>
+        </DateContainer>
       </RoadMapItemContainer>
       <div>
         {!isEditing && (
           <ItemImage
             src="./icons/pencil.svg"
             alt="Edit icon"
-            onClick={() => onEdit(number)}
+            onClick={() => handleEdit(number)}
           />
         )}
         {isEditing && (
@@ -175,7 +271,7 @@ const RoadMapItem: React.FC<RoadMapItemProps> = ({
             <ItemImage
               src="./icons/Cancel.svg"
               alt="Cancel icon"
-              onClick={() => onCancel(number)}
+              onClick={() => handleCancel(number)}
             />
           </>
         )}

@@ -62,7 +62,7 @@ const RoadmapCard: React.FC<RoadmapCardProps> = ({
 export default RoadmapCard;
 
 const Card = styled.div`
-  width: 334px;//calc(25% - (38px));
+  width: 334px;
   margin: 19px;
   background: #F6F9F3;
   border-radius: 13px;
@@ -71,7 +71,14 @@ const Card = styled.div`
   justify-content: start;
   align-items: center;
   flex-direction: column;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
   
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+    background: #F0F5EC;
+  }
 `;
 
 const ProgressBar = styled.div`
