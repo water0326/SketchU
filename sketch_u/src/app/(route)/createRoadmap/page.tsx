@@ -204,15 +204,15 @@ const DUMMY_ROADMAP_DATA = [
     topic: 'Practical Applications',
     description: 'Apply concepts through hands-on exercises',
     start_date: '2024-03-22',
-    deadline: '2024-04-24',
+    deadline: '2024-03-24',
     note: 'Complete practice projects'
   },
   {
     seq: 3,
     topic: 'Advanced Concepts',
     description: 'Explore advanced topics and best practices',
-    start_date: '2024-04-25',
-    deadline: '2024-04-30',
+    start_date: '2024-03-25',
+    deadline: '2024-03-30',
     note: 'Deep dive into complex scenarios'
   }
 ];
@@ -415,12 +415,13 @@ const StudyForm: React.FC = () => {
         note: session.note
       }));
 
-      setRoadmapItems(newRoadmapItems);
+      // 날짜 조정
+      const adjustedItems = adjustDatesToStartDate(newRoadmapItems, startDate);
+      setRoadmapItems(adjustedItems);
       setMovedUp(true);
     } catch (error) {
       console.error('Failed to create roadmap:', error);
       setRoadmapName(inputValue);
-      // 에러 발생 시에도 더미 데이터 사용
       const newRoadmapItems = DUMMY_ROADMAP_DATA.map(session => ({
         number: session.seq,
         name: session.topic,
@@ -431,7 +432,9 @@ const StudyForm: React.FC = () => {
         note: session.note
       }));
 
-      setRoadmapItems(newRoadmapItems);
+      // 날짜 조정
+      const adjustedItems = adjustDatesToStartDate(newRoadmapItems, startDate);
+      setRoadmapItems(adjustedItems);
       setMovedUp(true);
     }
   };
@@ -505,28 +508,35 @@ const StudyForm: React.FC = () => {
     const [draggedItem] = updatedItems.splice(draggingIndex, 1);
     updatedItems.splice(overIndex, 0, draggedItem);
 
-    // 첫 번째 아이템의 시작일을 전체 로드맵 시작일로 설정
-    const adjustedItems = updatedItems.map((item, idx) => {
-      if (idx === 0) {
-        const duration = item.deadline ? getDaysDifference(item.startDate || startDate, item.deadline) : 7;
-        return {
-          ...item,
-          number: idx + 1,
-          startDate: startDate,
-          deadline: addDays(startDate, duration)
-        };
-      }
-      return { ...item, number: idx + 1 };
-    });
-
-    // 순서가 변경된 후 나머지 아이템들의 날짜 조정
-    const finalItems = adjustDates(adjustedItems);
-
     setDraggingIndex(overIndex);
-    setRoadmapItems(finalItems);
+    setRoadmapItems(updatedItems);
   };
 
   const handleDrop = () => {
+    if (draggingIndex === null) return;
+
+    // 아이템의 순서가 변경된 후, 날짜를 조정
+    const updatedItems = adjustDates(roadmapItems);
+
+    // 전체 로드맵의 시작일과 종료일을 유지하면서 날짜 조정
+    const totalDuration = getDaysDifference(updatedItems[0].startDate, updatedItems[updatedItems.length - 1].deadline);
+    const newStartDate = new Date(startDate);
+    const newEndDate = addDays(newStartDate.toISOString().split('T')[0], totalDuration);
+
+    const adjustedItems = updatedItems.map((item, index) => {
+      const duration = getDaysDifference(item.startDate, item.deadline);
+      if (index === 0) {
+        item.startDate = newStartDate.toISOString().split('T')[0];
+      } else {
+        item.startDate = addDays(updatedItems[index - 1].deadline, 1);
+      }
+      item.deadline = addDays(item.startDate, duration);
+      // seq 값을 업데이트
+      item.number = index + 1;
+      return item;
+    });
+
+    setRoadmapItems(adjustedItems);
     setDraggingIndex(null);
   };
 
@@ -595,31 +605,31 @@ const StudyForm: React.FC = () => {
     );
 
     // 겹치는 날짜가 있는 경우에만 조정
-    const adjustedItems = adjustDates(sortedItems);
+    const adjustedItems = adjustDatesToStartDate(sortedItems, startDate);
     setRoadmapItems(adjustedItems);
   };
 
   // 전체 로드맵 시작일 변경 핸들러
   const handleRoadmapStartDateChange = (newStartDate: string) => {
     setStartDate(newStartDate);
-    
     // 각 아이템의 기간을 유지하면서 날짜 조정
-    const updatedItems = roadmapItems.map((item, index) => {
+    const adjustedItems = adjustDatesToStartDate(roadmapItems, newStartDate);
+    setRoadmapItems(adjustedItems);
+  };
+
+  // 날짜 조정 함수 추가
+  const adjustDatesToStartDate = (items: any[], newStartDate: string) => {
+    return items.map((item, index) => {
+      const duration = getDaysDifference(item.startDate, item.deadline);
       if (index === 0) {
-        // 첫 번째 아이템의 시작일을 새로운 시작일로 설정
-        const duration = item.deadline ? getDaysDifference(item.startDate || newStartDate, item.deadline) : 7;
-        return {
-          ...item,
-          startDate: newStartDate,
-          deadline: addDays(newStartDate, duration)
-        };
+        item.startDate = newStartDate;
+      } else {
+        const prevItem = items[index - 1];
+        item.startDate = addDays(prevItem.deadline, 1);
       }
+      item.deadline = addDays(item.startDate, duration);
       return item;
     });
-
-    // 전체 로드맵 날짜 재조정
-    const adjustedItems = adjustDates(updatedItems);
-    setRoadmapItems(adjustedItems);
   };
 
   return (
