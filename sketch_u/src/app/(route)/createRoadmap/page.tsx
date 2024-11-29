@@ -238,6 +238,51 @@ const RoadmapTitle = styled.input`
   }
 `;
 
+const ContentWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  gap: 40px;
+  height: 100%;
+`;
+
+const TimelineContainer = styled.div`
+  width: 120px;
+  height: 100%;
+  padding: 20px 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const Timeline = styled.div`
+  width: 4px;
+  background-color: #E9E9E9;
+  height: 100%;
+  position: relative;
+  border-radius: 2px;
+`;
+
+const SessionHandle = styled.div<{ $top: number, $height: number }>`
+  position: absolute;
+  left: -8px;
+  width: 20px;
+  height: ${props => props.$height}px;
+  background-color: #76c7c0;
+  border-radius: 10px;
+  top: ${props => props.$top}px;
+  cursor: grab;
+  
+  &:hover {
+    background-color: #63aea6;
+  }
+  
+  &:active {
+    cursor: grabbing;
+  }
+`;
+
 // 날짜 관련 유틸리티 함수들 추가
 const adjustDates = (items: any[]) => {
   return items.map((item, index) => {
