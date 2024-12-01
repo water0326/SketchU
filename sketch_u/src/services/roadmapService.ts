@@ -3,7 +3,7 @@ import { SaveRoadmapRequest, SaveRoadmapResponse, GetAllRoadmapsResponse } from 
 
 
 export class RoadmapService {
-  private static readonly BASE_URL = 'https://localhost:8081/api';
+  private static readonly BASE_URL = 'http://localhost:8081/api';
 
   static apiFetch = (endpoint: string, options?: RequestInit) => {
     return fetch(`${this.BASE_URL}${endpoint}`, options);
