@@ -31,6 +31,8 @@ export class RoadmapService {
       }
 
       const data = await response.json();
+      data.sessionData = JSON.parse(data.sessionData);
+
       return {
         success: true,
         data
@@ -105,6 +107,8 @@ export class RoadmapService {
       }
 
       const data = await response.json();
+      data.sessionData = JSON.parse(data.sessionData);
+
       return {
         success: true,
         data
