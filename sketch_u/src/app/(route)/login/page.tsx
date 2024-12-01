@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 import ProfileButton from '@/app/_components/profile';
+import { RoadmapService } from '@/services/roadmapService';
 
 const Container = styled.div`
   width: 100%;
@@ -122,7 +123,7 @@ export default function LoginPage() {
     e.preventDefault();
     
     try {
-      const response = await fetch('/api/users/login', {
+      const response = await RoadmapService.apiFetch('/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
