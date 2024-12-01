@@ -403,6 +403,7 @@ const StudyForm: React.FC = () => {
         setRoadmapName(inputValue);
       } else {
         roadmapData = await response.json();
+        roadmapData.sessionData = JSON.parse(roadmapData.sessionData);
         setRoadmapName(roadmapData.roadmapName || inputValue);
       }
       

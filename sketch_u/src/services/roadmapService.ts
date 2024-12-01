@@ -51,13 +51,16 @@ export class RoadmapService {
         throw new Error('No access token found');
       }
 
+      let tempData: any = data;
+      tempData.sessionData = JSON.stringify(data.sessionData);
+
       const response = await this.apiFetch(`/roadmap/saveroadmap`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${accessToken}`
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(tempData)
       });
 
       if (!response.ok) {
