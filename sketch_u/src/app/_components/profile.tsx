@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useRouter } from "next/navigation";
+import { RoadmapService } from "@/services/roadmapService";
 
 const Button = styled.button`
   position: absolute;
@@ -126,7 +127,7 @@ export default function ProfileButton() {
         return;
       }
 
-      const response = await fetch('/api/users/logout', {
+      const response = await RoadmapService.apiFetch('/users/logout', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`
