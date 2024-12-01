@@ -16,8 +16,8 @@ export class RoadmapService {
         throw new Error('No access token found');
       }
 
-      const response = await this.apiFetch(`/roadmap/getallroadmap`, {
-        method: 'POST',
+      const response = await this.apiFetch(`/roadmap/getallroadmaps`, {
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`
         }
@@ -31,7 +31,9 @@ export class RoadmapService {
       }
 
       const data = await response.json();
-      data.sessionData = JSON.parse(data.sessionData);
+      data.forEach((item: any) => {
+        item.sessionData = JSON.parse(item.sessionData);
+      });
 
       return {
         success: true,
