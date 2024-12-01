@@ -408,7 +408,7 @@ interface RoadmapData {
 // API 호출을 위한 함수 추가
 const updateRoadmap = async (updatedData: RoadmapData) => {
   try {
-    const response = await fetch('/roadmap/updateroadmap', {
+    const response = await RoadmapService.apiFetch('/roadmap/updateroadmap', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -429,7 +429,7 @@ const updateRoadmap = async (updatedData: RoadmapData) => {
 // Add the saveRoadmap function
 const saveRoadmap = async (updatedData: RoadmapData) => {
   try {
-    const response = await fetch('/roadmap/saveroadmap', {
+    const response = await RoadmapService.apiFetch('/roadmap/saveroadmap', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

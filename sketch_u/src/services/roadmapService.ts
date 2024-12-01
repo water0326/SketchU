@@ -1,7 +1,13 @@
 import { SaveRoadmapRequest, SaveRoadmapResponse, GetAllRoadmapsResponse } from '@/types/roadmap';
 
+
+
 export class RoadmapService {
-  private static readonly BASE_URL = '/api/roadmap';
+  private static readonly BASE_URL = 'https://roadmap-server-production.up.railway.app/api';
+
+  static apiFetch = (endpoint: string, options?: RequestInit) => {
+    return fetch(`${this.BASE_URL}${endpoint}`, options);
+  };
 
   static async getAllRoadmaps(): Promise<GetAllRoadmapsResponse> {
     try {
@@ -10,7 +16,7 @@ export class RoadmapService {
         throw new Error('No access token found');
       }
 
-      const response = await fetch(`${this.BASE_URL}/getallroadmap`, {
+      const response = await this.apiFetch(`/roadmap/getallroadmap`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`
@@ -45,7 +51,7 @@ export class RoadmapService {
         throw new Error('No access token found');
       }
 
-      const response = await fetch(`${this.BASE_URL}/saveroadmap`, {
+      const response = await this.apiFetch(`/roadmap/saveroadmap`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +84,7 @@ export class RoadmapService {
         throw new Error('No access token found');
       }
 
-      const response = await fetch(`${this.BASE_URL}/getroadmap?roadmapId=${roadmapId}`, {
+      const response = await this.apiFetch(`/roadmap/getroadmap?roadmapId=${roadmapId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`

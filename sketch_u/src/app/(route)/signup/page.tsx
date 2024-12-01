@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 import ProfileButton from '@/app/_components/profile';
+import { RoadmapService } from '@/services/roadmapService';
 
 const Container = styled.div`
   width: 100%;
@@ -173,7 +174,7 @@ export default function SignUpPage() {
     e.preventDefault();
     if (validateForm()) {
       try {
-        const response = await fetch('/api/users/register', {
+        const response = await RoadmapService.apiFetch('/users/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

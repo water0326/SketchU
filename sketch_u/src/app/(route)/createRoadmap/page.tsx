@@ -384,7 +384,7 @@ const StudyForm: React.FC = () => {
     if (inputValue.trim() === '') return;
     
     try {
-      const response = await fetch(`/api/roadmap/createroadmap?topic=${encodeURIComponent(inputValue)}`, {
+      const response = await RoadmapService.apiFetch(`/roadmap/createroadmap?topic=${encodeURIComponent(inputValue)}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
@@ -445,7 +445,6 @@ const StudyForm: React.FC = () => {
       handleButtonClick();
     }
   };
-
   const handleEdit = (id: number) => {
     setOriginalValues({
       items: [...roadmapItems],
@@ -714,3 +713,4 @@ const StudyForm: React.FC = () => {
 };
 
 export default StudyForm;
+
