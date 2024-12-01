@@ -6,8 +6,8 @@ import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 
 type RoadmapCardProps = {
-  title: string;
-  subtitle: string;
+  currentSession: string;
+  nextSession: string;
   category: string;
   daysLeft: number;
   progress: number;
@@ -16,8 +16,8 @@ type RoadmapCardProps = {
 };
 
 const RoadmapCard: React.FC<RoadmapCardProps> = ({
-  title,
-  subtitle,
+  currentSession: title,
+  nextSession: subtitle,
   category,
   daysLeft,
   progress,
@@ -27,17 +27,7 @@ const RoadmapCard: React.FC<RoadmapCardProps> = ({
   const router = useRouter();
 
   const handleClick = () => {
-    const queryString = new URLSearchParams({
-      roadmapId: roadmapId.toString(),
-      title,
-      subtitle,
-      category,
-      daysLeft: daysLeft.toString(),
-      progress: progress.toString(),
-      maxProgress: maxProgress.toString(),
-    }).toString();
-
-    router.push(`/roadmap?${queryString}`);
+    router.push(`/roadmap?roadmapId=${roadmapId}`);
   };
 
   return (

@@ -1,9 +1,11 @@
 "use client";
   
 import styled from 'styled-components';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ProfileButton from '@/app/_components/profile';
 import NewRoadmap from '@/app/_components/newRoadmap';
+import { RoadmapService } from '@/services/roadmapService';
+import { useRouter } from 'next/navigation';
 
 const Container = styled.div`
   width: 100%;
@@ -424,6 +426,26 @@ const updateRoadmap = async (updatedData: RoadmapData) => {
   }
 };
 
+// Add the saveRoadmap function
+const saveRoadmap = async (updatedData: RoadmapData) => {
+  try {
+    const response = await fetch('/roadmap/saveroadmap', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+      body: JSON.stringify(updatedData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+  } catch (error) {
+    console.error('로드맵 저장 실패:', error);
+  }
+};
+
 export default function HomePage() {
   const [selectedSession, setSelectedSession] = useState<number | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -498,7 +520,42 @@ export default function HomePage() {
     }
   };
 
-  const [roadmapData, setRoadmapData] = useState<RoadmapData>(initialRoadmapData);
+  const [roadmapData, setRoadmapData] = useState<RoadmapData | null>(null);
+  const router = useRouter();
+  
+  useEffect(() => {
+    const fetchRoadmap = async () => {
+      const searchParams = new URLSearchParams(window.location.search);
+      const roadmapId = searchParams.get('roadmapId');
+      
+      if (!roadmapId) {
+        router.push('/roadmapList');
+        return;
+      }
+
+      const result = await RoadmapService.getRoadmap(parseInt(roadmapId));
+      
+      if (result.success && result.data) {
+        setRoadmapData(result.data);
+      } else {
+        if (result.error === 'Unauthorized') {
+          router.push('/login');
+          return;
+        }
+        if (result.error === 'Roadmap not found') {
+          router.push('/roadmapList');
+          return;
+        }
+        console.error('Failed to fetch roadmap:', result.error);
+      }
+    };
+
+    fetchRoadmap();
+  }, [router]);
+
+  if (!roadmapData) {
+    return <div>Loading...</div>;
+  }
 
   // handleNoteChange 함수 수정
   const handleNoteChange = async (note: string) => {
@@ -515,7 +572,7 @@ export default function HomePage() {
     };
     
     setRoadmapData(newData);
-    await updateRoadmap(newData);
+    await saveRoadmap(newData);
   };
 
   const handleEditClick = () => {
@@ -566,7 +623,7 @@ export default function HomePage() {
         };
         adjustmentsMade = true;
         
-        // 이전 세션의 시작일이 그 이전 세션의 마감일보다 앞서면 재귀 호출
+        // 이전 세션의 시작일이 그 이전 션의 마감일보다 앞서면 재귀 호출
         adjustPreviousSessions(currentIndex - 1, newStartDate.toISOString().split('T')[0]);
       }
     };
@@ -626,15 +683,19 @@ export default function HomePage() {
       showTooltipMessage('인접한 세션들의 날짜를 앞당기거나 미루었습니다.');
     }
 
-    await updateRoadmap(newData);
+    await saveRoadmap(newData);
   };
 
-  const handleSessionComplete = () => {
+  const handleSessionComplete = async () => {
     if (selectedSession === roadmapData.achieved) {
-      setRoadmapData(prev => ({
-        ...prev,
-        achieved: prev.achieved + 1
-      }));
+      const newData = {
+        ...roadmapData,
+        achieved: roadmapData.achieved + 1
+      };
+      
+      setRoadmapData(newData);
+      await saveRoadmap(newData);
+      
       if (selectedSession < roadmapData.sessionData.result.length - 1) {
         setSelectedSession(selectedSession + 1);
       }
@@ -642,11 +703,14 @@ export default function HomePage() {
     }
   };
 
-  const handleSessionCancel = () => {
-    setRoadmapData(prev => ({
-      ...prev,
-      achieved: prev.achieved - 1
-    }));
+  const handleSessionCancel = async () => {
+    const newData = {
+      ...roadmapData,
+      achieved: roadmapData.achieved - 1
+    };
+    
+    setRoadmapData(newData);
+    await saveRoadmap(newData);
   };
 
   const handleAddSession = () => {
@@ -662,6 +726,7 @@ export default function HomePage() {
     };
     
     setRoadmapData(prev => {
+      if (!prev) return null;
       const updatedSessions = [
         ...prev.sessionData.result.slice(0, selectedSession + 1),
         newSession,
@@ -694,6 +759,7 @@ export default function HomePage() {
     if (selectedSession === null) return;
     
     setRoadmapData(prev => {
+      if (!prev) return null;
       const updatedSessions = prev.sessionData.result.filter((_, index) => index !== selectedSession);
       // 세션 번호 재정렬
       const reorderedSessions = updatedSessions.map((session, index) => ({

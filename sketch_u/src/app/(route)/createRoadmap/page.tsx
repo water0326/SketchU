@@ -6,6 +6,7 @@ import ProfileButton from '@/app/_components/profile';
 import RoadMapItem from './roadmapItem';
 import NewRoadmap from '@/app/_components/newRoadmap';
 import { useRouter } from 'next/navigation';
+import { RoadmapService } from '@/services/roadmapService';
 
 const StudyContainer = styled.div<{ $movedUp: boolean }>`
   display: flex;
@@ -548,40 +549,27 @@ const StudyForm: React.FC = () => {
   };
 
   const handleSaveRoadmap = async () => {
-    try {
-      const requestBody = {
-        roadmapName: roadmapName,
-        sessionData: roadmapItems.map(item => ({
-          seq: item.number,
-          topic: item.name,
-          description: item.description,
-          start_date: item.startDate,
-          deadline: item.deadline,
-          note: item.note || null
-        }))
-      };
+    const requestBody = {
+      roadmapName: roadmapName,
+      sessionData: roadmapItems.map(item => ({
+        seq: item.number,
+        topic: item.name,
+        description: item.description,
+        start_date: item.startDate,
+        deadline: item.deadline,
+        note: item.note || null
+      }))
+    };
 
-      const response = await fetch('/api/roadmap/saveroadmap', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        },
-        body: JSON.stringify(requestBody)
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          router.push('/login');
-          return;
-        }
-        throw new Error('Failed to save roadmap');
-      }
-
-      // Optional: Add success feedback here
+    const result = await RoadmapService.saveRoadmap(requestBody);
+    
+    if (result.success) {
       alert('로드맵이 저장되었습니다!');
-    } catch (error) {
-      console.error('Failed to save roadmap:', error);
+    } else {
+      if (result.error === 'Unauthorized') {
+        router.push('/login');
+        return;
+      }
       alert('로드맵 저장에 실패했습니다.');
     }
   };
