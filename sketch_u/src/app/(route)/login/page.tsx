@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 import ProfileButton from '@/app/_components/profile';
 import { RoadmapService } from '@/services/roadmapService';
-import { colors } from '@/app/utils/colorSheet';
 
 const Container = styled.div`
   width: 100%;
@@ -18,7 +17,7 @@ const Container = styled.div`
 const LoginBox = styled.div`
   width: 800px;
   padding: 32px;
-  background: ${colors.white};
+  background: white;
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -29,7 +28,7 @@ const LoginBox = styled.div`
 const Title = styled.h1`
   font-size: 24px;
   font-weight: 600;
-  color: ${colors.text.primary};
+  color: #333;
   margin-bottom: 32px;
   text-align: center;
 `;
@@ -60,21 +59,21 @@ const Input = styled.input`
   width: 482px;
   height: 50px;
   padding: 0 16px;
-  border: 1px solid ${colors.border};
+  border: 1px solid #E5E5E5;
   border-radius: 25px;
   font-size: 15px;
-  background: ${colors.roadmap.inputBg};
-  box-shadow: inset 0 3px 8px ${colors.roadmap.inputShadow};
+  background: #F6F9F3;
+  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.2s ease;
 
   &:focus {
     outline: none;
-    border-color: ${colors.current.background};
-    background: ${colors.white};
+    border-color: #90D8BF;
+    background: white;
   }
 
   &::placeholder {
-    color: ${colors.text.secondary};
+    color: #999;
   }
 `;
 
@@ -82,28 +81,10 @@ const LoginButton = styled.button`
   width: 482px;
   height: 50px;
   margin-top: 35px;
-  background: ${colors.roadmapPage.button.primary};
+  background: #90D8BF;
   border: none;
   border-radius: 25px;
-  color: ${colors.black};
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-
-  &:hover {
-    background: ${colors.roadmapPage.button.primaryHover};
-  }
-`;
-
-const SignUpButton = styled.button`
-  width: 482px;
-  height: 50px;
-  margin-top: 18px;
-  background: ${colors.button.background};
-  border-radius: 25px;
-  color: ${colors.text.secondary};
+  color: black;
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
@@ -111,7 +92,25 @@ const SignUpButton = styled.button`
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 
   &:hover {
-    background: ${colors.button.hover};
+    background: #7EC5AD;
+  }
+`;
+
+const SignUpButton = styled.button`
+  width: 482px;
+  height: 50px;
+  margin-top: 18px;
+  background: #F6F9F3;
+  border-radius: 25px;
+  color: #666;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+
+  &:hover {
+    background: #EDF3EA;
   }
 `;
 

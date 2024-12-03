@@ -8,7 +8,6 @@ import ProfileButton from '@/app/_components/profile';
 import NewRoadmap from '@/app/_components/newRoadmap';
 import { RoadmapService } from '@/services/roadmapService';
 import { RoadmapListResponse } from '@/types/roadmap';
-import { colors } from '@/app/utils/colorSheet';
 
 
 const Roadmap: React.FC = () => {
@@ -43,6 +42,10 @@ const Roadmap: React.FC = () => {
       }
     });
   };
+
+  useEffect(() => {
+    setSearchParams(new URLSearchParams(window.location.search));
+  }, []);
 
   useEffect(() => {
     const fetchRoadmaps = async () => {
@@ -179,10 +182,10 @@ const SortContainer = styled.div`
   width: 200px;
   height: 45px;
   border-radius: 13px;
-  background-color: ${colors.roadmapPage.list.controls.background};
+  background-color: #F4F4F4;
   font-weight: 600;
   font-size: 17px;
-  filter: drop-shadow(0 4px 5px ${colors.roadmapPage.list.controls.shadow});
+  filter: drop-shadow(0 4px 5px rgba(0,0,0,0.15));
   display: flex;
   justify-content: center;
   align-items: center;
@@ -197,20 +200,20 @@ const SortSelect = styled.select`
   margin-left: 15px;
 
   &:hover {
-    border-color: ${colors.roadmapPage.list.controls.select.hover};
+    border-color: #BDBDBD;
   }
 
   &:focus {
-    border-color: ${colors.roadmapPage.list.controls.select.focus};
-    box-shadow: 0 0 8px ${colors.roadmapPage.list.controls.select.focusShadow};
+    border-color: #90CAF9;
+    box-shadow: 0 0 8px rgba(144, 202, 249, 0.4);
   }
 `;
 
 const SortOption = styled.option`
   font-size: 16px;
   font-weight: 600;
-  background-color: ${colors.roadmapPage.list.controls.select.option.background};
-  color: ${colors.roadmapPage.list.controls.select.option.text};
+  background-color: #FFFFFF;
+  color: #333;
   padding: 10px;
 `;
 
@@ -219,7 +222,7 @@ const Checkbox = styled.label`
   width: 167px;
   height: 45px;
   border-radius: 13px;
-  background-color: ${colors.roadmapPage.list.controls.checkbox.background};
+  background-color: #F4F4F4;
   filter: drop-shadow(0 4px 5px rgba(0,0,0,0.15));
   font-weight: 600;
   font-size: 17px;
@@ -241,7 +244,7 @@ const StyledCheckBox = styled.div`
   height: 36px;
   border-radius: 13px;
   margin-left: 8px;
-  background-color: ${colors.roadmapPage.list.controls.checkbox.inner};
+  background-color: #F6F9F3;
   border: none;
   display: flex;
   justify-content: center;
@@ -267,17 +270,17 @@ const CardContainer = styled.div`
   }
 
   &::-webkit-scrollbar-track {
-    background: ${colors.roadmapPage.list.cardContainer.scrollbar.track};
+    background: #f1f1f1;
     border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: ${colors.roadmapPage.list.cardContainer.scrollbar.thumb};
+    background: #888;
     border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: ${colors.roadmapPage.list.cardContainer.scrollbar.thumbHover};
+    background: #555;
   }
 `;
 

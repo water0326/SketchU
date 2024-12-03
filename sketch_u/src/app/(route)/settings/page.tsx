@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import ProfileButton from '@/app/_components/profile';
 import NewRoadmap from '@/app/_components/newRoadmap';
-import { colors } from '@/app/utils/colorSheet';
 
 const Container = styled.div`
   padding: 24px;
@@ -28,17 +27,17 @@ const SettingsContainer = styled.div`
   }
 
   &::-webkit-scrollbar-track {
-    background: ${colors.roadmapPage.scrollbar.track};
+    background: #f1f1f1;
     border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: ${colors.roadmapPage.scrollbar.thumb};
+    background: #90D8BF;
     border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: ${colors.roadmapPage.scrollbar.thumbHover};
+    background: #7EC5AD;
   }
 `;
 
@@ -49,7 +48,7 @@ const Section = styled.div`
 const SectionTitle = styled.h2`
   font-size: 24px;
   font-weight: 600;
-  color: ${colors.text.primary};
+  color: #333;
   margin-bottom: 20px;
 `;
 
@@ -58,10 +57,10 @@ const SettingItem = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  background: ${colors.completed.background};
+  background: #F6F9F3;
   border-radius: 13px;
   margin-bottom: 16px;
-  box-shadow: 0 2px 4px ${colors.completed.shadow};
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 `;
 
 const SettingInfo = styled.div`
@@ -71,13 +70,13 @@ const SettingInfo = styled.div`
 const SettingTitle = styled.h3`
   font-size: 18px;
   font-weight: 600;
-  color: ${colors.text.secondary};
+  color: #3C3C3C;
   margin-bottom: 6px;
 `;
 
 const SettingDescription = styled.p`
   font-size: 14px;
-  color: ${colors.text.secondary};
+  color: #666;
 `;
 
 const Toggle = styled.label`
@@ -94,7 +93,7 @@ const ToggleInput = styled.input`
   height: 0;
 
   &:checked + span {
-    background-color: ${colors.roadmapPage.button.primary};
+    background-color: #90D8BF;
   }
 
   &:checked + span:before {
@@ -120,51 +119,39 @@ const ToggleSlider = styled.span`
     width: 20px;
     left: 4px;
     bottom: 4px;
-    background-color: ${colors.white};
+    background-color: white;
     transition: .4s;
     border-radius: 50%;
   }
 `;
 
 const Button = styled.button`
-  background: ${colors.roadmapPage.button.primary};
+  background: #90D8BF;
   border: none;
   border-radius: 25px;
   padding: 12px 24px;
-  color: ${colors.text.primary};
+  color: #000;
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 3px 8px ${colors.completed.shadow};
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 
   &:hover {
-    background: ${colors.roadmapPage.button.primaryHover};
+    background: #7EC5AD;
   }
 `;
 
 const DeleteButton = styled(Button)`
-  background: ${colors.roadmapPage.button.delete};
+  background: #FF9494;
   
   &:hover {
-    background: ${colors.roadmapPage.button.deleteHover};
+    background: #FF7070;
   }
 `;
 
 export default function SettingsPage() {
   const [darkMode, setDarkMode] = useState(false);
-
-  useEffect(() => {
-    const savedDarkMode = localStorage.getItem('darkMode');
-    if (savedDarkMode !== null) {
-      setDarkMode(JSON.parse(savedDarkMode));
-    }
-  }, []);
-
-  const handleDarkModeChange = (checked: boolean) => {
-    setDarkMode(checked);
-    localStorage.setItem('darkMode', JSON.stringify(checked));
-  };
 
   return (
     <Container>
@@ -184,7 +171,7 @@ export default function SettingsPage() {
               <ToggleInput 
                 type="checkbox" 
                 checked={darkMode}
-                onChange={(e) => handleDarkModeChange(e.target.checked)}
+                onChange={(e) => setDarkMode(e.target.checked)}
               />
               <ToggleSlider />
             </Toggle>

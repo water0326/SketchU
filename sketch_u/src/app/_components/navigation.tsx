@@ -4,15 +4,14 @@ import styled from "styled-components";
 import MenuItemComponent from "./navMenuItem";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { colors } from "../utils/colorSheet";
 
 const Container = styled.div`
   min-width: 300px;
   max-width: 300px;
   width: 300px;
   height: 100vh;
-  background-color: ${colors.navigation.background};
-  box-shadow: 3px 0px 4px ${colors.current.shadow};
+  background-color: #90D8BF;
+  box-shadow: 3px 0px 4px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -43,7 +42,7 @@ const Menu = styled.div`
 const VerticalLine = styled.div`
   width: 1px;
   height: 114px;
-  background-color: ${colors.black};
+  background-color: black;
   margin-left: 28px;
   margin-top: 2px;
 `;

@@ -8,7 +8,6 @@ import { RoadmapService } from '@/services/roadmapService';
 import { RoadmapListResponse } from '@/types/roadmap';
 import type { SessionItem } from '@/types/roadmap';
 import { useRouter } from 'next/navigation';
-import { colors } from '@/app/utils/colorSheet';
 
 const Container = styled.div`
   width: 100%;
@@ -46,7 +45,7 @@ const Sidebar = styled.div`
 `;
 
 const Content = styled.div`
-  background: ${colors.roadmapPage.background.content};
+  background: #F2F2F2;
   border-radius: 13px;
   width: 35%;
   height: 100%;
@@ -90,7 +89,7 @@ const ContentBody = styled.div`
   flex-direction: column;
   font-size: 18px;
   font-weight: 600;
-  color: ${colors.roadmapPage.text.secondary};
+  color: #3C3C3C;
 `;
 
 const MemoTitle = styled.div`
@@ -100,12 +99,12 @@ const MemoTitle = styled.div`
 `;
 
 const MemoContent = styled.textarea`
-  background: ${colors.white};
+  background: #FFFFFF;
   padding: 15px;
   border-radius: 8px;
   flex: 1;
   margin: 0 0 20px 0;
-  color: ${colors.roadmapPage.text.secondary};
+  color: #3C3C3C;
   border: none;
   resize: none;
   font-family: inherit;
@@ -120,26 +119,26 @@ const SaveButton = styled.button<{ isActive: boolean }>`
   width: calc(100% - 52px);
   height: 37px;
   margin: 0 26px 19px 26px;
-  background: ${props => props.isActive ? colors.roadmapPage.button.primary : colors.roadmapPage.button.disabled};
+  background: ${props => props.isActive ? '#90D8BF' : '#D9D9D9'};
   border: none;
   border-radius: 13px;
-  color: ${props => props.isActive ? colors.roadmapPage.text.primary : colors.roadmapPage.text.quaternary};
+  color: ${props => props.isActive ? '#000000' : '#666666'};
   font-weight: 600;
   font-size: 17px;
   cursor: ${props => props.isActive ? 'pointer' : 'default'};
 
   &:hover {
-    background: ${props => props.isActive ? colors.roadmapPage.button.primaryHover : colors.roadmapPage.button.disabled};
+    background: ${props => props.isActive ? '#7EC5AD' : '#D9D9D9'};
   }
 `;
 
 const CancelButton = styled(SaveButton)`
-  background: ${colors.roadmapPage.button.delete};
-  color: ${colors.roadmapPage.text.primary};
+  background: #FF9494;
+  color: #000000;
   cursor: pointer;
 
   &:hover {
-    background: ${colors.roadmapPage.button.deleteHover};
+    background: #FF7070;
   }
 `;
 
@@ -151,7 +150,7 @@ const RoadmapTitle = styled.div`
 const Divider = styled.hr`
   border: none;
   height: 2px;
-  background-color: ${colors.roadmapPage.divider};
+  background-color: #525252;
   margin: 1rem 0;
 `;
 
@@ -167,17 +166,17 @@ const SessionList = styled.ul`
   }
 
   &::-webkit-scrollbar-track {
-    background: ${colors.roadmapPage.scrollbar.track};
+    background: #f1f1f1;
     border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: ${colors.roadmapPage.scrollbar.thumb};
+    background: #90D8BF;
     border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: ${colors.roadmapPage.scrollbar.thumbHover};
+    background: #7EC5AD;
   }
 `;
 
@@ -210,18 +209,18 @@ const SessionItem = styled.li<{
     background: ${(props) => {
         switch (props.status) {
             case 'completed':
-                return colors.roadmapPage.session.completed;
+                return '#F6F9F3';
             case 'current':
-                return colors.roadmapPage.session.current;
+                return '#90D8BF';
             case 'upcoming':
-                return colors.roadmapPage.session.upcoming;
+                return '#F2F2F2';
         }
     }};
     border-radius: 13px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    box-shadow: ${props => props.selected ? colors.roadmapPage.session.shadow : 'none'};
+    box-shadow: ${props => props.selected ? '0px 4px 5px rgba(0, 0, 0, 0.25)' : 'none'};
     position: relative;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 
@@ -239,14 +238,14 @@ const SessionTitleContainer = styled.div`
 
 const Number = styled.div`
     font-size: 26px;
-    color: ${colors.roadmapPage.text.secondary};
+    color: #3C3C3C;
     font-weight: 600;
 `;
 
 const Title = styled.div`
     margin-left: 7px;
     font-size: 23px;
-    color: ${colors.roadmapPage.text.primary};
+    color: #000000;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -256,7 +255,7 @@ const Title = styled.div`
 
 const SessionDescription = styled.div`
     font-size: 18px;
-    color: ${colors.roadmapPage.text.secondary};
+    color: #3C3C3C;
     font-weight: 400;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -274,7 +273,7 @@ const Note = styled.div`
 const ContentDivider = styled.hr`
   border: none;
   height: 2px;
-  background-color: ${colors.roadmapPage.divider};
+  background-color: #525252;
   margin: 67px 0 0px 0;
 `;
 
@@ -284,7 +283,7 @@ const Modal = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background: ${colors.roadmapPage.background.modal};
+  background: rgba(0, 0, 0, 0.25);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -293,24 +292,24 @@ const Modal = styled.div`
 `;
 
 const ModalContent = styled.div`
-  background: ${colors.roadmapPage.modal.background};
+  background: #FFFFFF;
   padding: 40px;
   border-radius: 13px;
   width: 450px;
   text-align: center;
-  filter: drop-shadow(0px 4px 12px ${colors.roadmapPage.modal.shadow});
+  filter: drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.15));
 `;
 
 const ModalTitle = styled.h3`
   font-size: 26px;
   font-weight: 600;
-  color: ${colors.roadmapPage.text.secondary};
+  color: #3C3C3C;
   margin-bottom: 15px;
 `;
 
 const ModalDescription = styled.p`
   font-size: 18px;
-  color: ${colors.roadmapPage.text.tertiary};
+  color: #525252;
   margin-bottom: 30px;
 `;
 
@@ -332,20 +331,20 @@ const ModalButton = styled.button`
   filter: drop-shadow(1px 3px 5px rgba(0, 0, 0, 0.2));
   
   &.cancel {
-    background: ${colors.roadmapPage.modal.button.cancel};
-    color: ${colors.roadmapPage.text.light};
+    background: #E9E9E9;
+    color: #141414;
     
     &:hover {
-      background: ${colors.roadmapPage.modal.button.cancelHover};
+      background: #d9d9d9;
     }
   }
   
   &.confirm {
-    background: ${colors.roadmapPage.modal.button.confirm};
-    color: ${colors.roadmapPage.text.primary};
+    background: #FF9494;
+    color: #000000;
     
     &:hover {
-      background: ${colors.roadmapPage.modal.button.confirmHover};
+      background: #FF7070;
     }
   }
 `;
@@ -354,13 +353,13 @@ const DateContainer = styled.div`
   display: flex;
   gap: 10px;
   margin: 10px 0;
-  color: ${colors.roadmapPage.text.tertiary};
+  color: #525252;
   font-size: 16px;
   font-weight: 400;
 `;
 
 const DateLabel = styled.span`
-  color: ${colors.roadmapPage.text.secondary};
+  color: #3C3C3C;
   font-weight: 600;
 `;
 
@@ -379,8 +378,8 @@ const CancelEditButton = styled.span`
 
 const TooltipContainer = styled.div<{ isVisible: boolean; isError?: boolean }>`
   position: fixed;
-  background: ${props => props.isError ? colors.roadmapPage.tooltip.error : colors.roadmapPage.tooltip.background};
-  color: ${props => props.isError ? colors.roadmapPage.tooltip.textError : colors.roadmapPage.tooltip.text};
+  background: ${props => props.isError ? '#FF9494' : '#FFFFFF'};
+  color: ${props => props.isError ? '#FFFFFF' : '#3C3C3C'};
   padding: 12px 20px;
   border-radius: 8px;
   font-size: 16px;
@@ -392,7 +391,7 @@ const TooltipContainer = styled.div<{ isVisible: boolean; isError?: boolean }>`
   opacity: ${props => props.isVisible ? 1 : 0};
   transition: opacity 0.3s ease;
   pointer-events: none;
-  filter: drop-shadow(0px 4px 8px ${colors.roadmapPage.tooltip.shadow});
+  filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.15));
 `;
 
 const RoadmapTitleContainer = styled.div`
@@ -547,7 +546,7 @@ export default function HomePage() {
         {
           seq: 6,
           topic: "기타 줄 끊보기",
-          description: "기타 줄을 4개로 만들어보요!",
+          description: "기타 줄을 4개로 만들어보아요!",
           start_date: "2024-04-16",
           deadline: "2024-04-20",
           note: null
@@ -886,11 +885,11 @@ export default function HomePage() {
                     onChange={(e) => setEditedRoadmapName(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSaveTitle()}
                     style={{
-                      fontSize: colors.roadmapPage.input.fontSize.title,
+                      fontSize: '33px',
                       fontWeight: '600',
-                      border: colors.roadmapPage.input.border,
-                      background: colors.roadmapPage.input.titleBackground,
-                      padding: colors.roadmapPage.input.padding.title,
+                      border: 'none',
+                      background: '#FFFFFF',
+                      padding: '5px 10px',
                       borderRadius: '8px',
                       width: '300px'
                     }}
@@ -994,12 +993,12 @@ export default function HomePage() {
                       value={editedTopic}
                       onChange={(e) => setEditedTopic(e.target.value)}
                       style={{
-                        fontSize: colors.roadmapPage.input.fontSize.description,
+                        fontSize: '26px',
                         fontWeight: '600',
                         width: '100%',
-                        border: colors.roadmapPage.input.border,
-                        background: colors.roadmapPage.input.editBackground,
-                        padding: colors.roadmapPage.input.padding.description
+                        border: 'none',
+                        background: '#F2F2F2',
+                        padding: '5px'
                       }}
                     />
                   ) : (
@@ -1018,11 +1017,11 @@ export default function HomePage() {
                         value={editedStartDate}
                         onChange={(e) => setEditedStartDate(e.target.value)}
                         style={{
-                          border: colors.roadmapPage.input.border,
-                          background: colors.roadmapPage.input.background,
-                          padding: colors.roadmapPage.input.padding.date,
+                          border: 'none',
+                          background: '#FFFFFF',
+                          padding: '2px 5px',
                           borderRadius: '4px',
-                          fontSize: colors.roadmapPage.input.fontSize.date
+                          fontSize: '16px'
                         }}
                       />
                     ) : (
@@ -1037,11 +1036,11 @@ export default function HomePage() {
                         value={editedDeadline}
                         onChange={(e) => setEditedDeadline(e.target.value)}
                         style={{
-                          border: colors.roadmapPage.input.border,
-                          background: colors.roadmapPage.input.background,
-                          padding: colors.roadmapPage.input.padding.date,
+                          border: 'none',
+                          background: '#FFFFFF',
+                          padding: '2px 5px',
                           borderRadius: '4px',
-                          fontSize: colors.roadmapPage.input.fontSize.date
+                          fontSize: '16px'
                         }}
                       />
                     ) : (
@@ -1058,9 +1057,9 @@ export default function HomePage() {
                     style={{
                       width: '100%',
                       minHeight: '100px',
-                      border: colors.roadmapPage.input.border,
-                      background: colors.roadmapPage.input.background,
-                      padding: colors.roadmapPage.input.padding.description,
+                      border: 'none',
+                      background: '#FFFFFF',
+                      padding: '10px',
                       borderRadius: '8px',
                       marginBottom: '20px'
                     }}
