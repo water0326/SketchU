@@ -13,16 +13,13 @@ interface SessionItem {
   note: string | null;
 }
 
-interface SessionData {
-  result: SessionItem[];
-}
 
 interface RoadmapData {
   roadmapId: number;
   userEntity: UserEntity;
   achieved: number;
   clear: boolean;
-  sessionData: SessionData;
+  sessionData: SessionItem[];
 }
 
 export interface SaveRoadmapRequest {
@@ -48,7 +45,7 @@ export interface RoadmapListResponse {
   userEntity: UserEntity | null;
   achieved: number;
   clear: boolean;
-  sessionData: SessionData;
+  sessionData: SessionItem[];
 }
 
 export interface GetAllRoadmapsResponse {

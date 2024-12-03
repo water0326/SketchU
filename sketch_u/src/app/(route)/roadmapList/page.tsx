@@ -52,6 +52,10 @@ const Roadmap: React.FC = () => {
     fetchRoadmaps();
   }, [roadmapId, router]);
 
+  useEffect(() => {
+    console.log(roadmapData);
+  }, [roadmapData]);
+
   return (
     <Container>
       <ProfileButton />
@@ -79,23 +83,23 @@ const Roadmap: React.FC = () => {
             key={roadmap.roadmapId}
             roadmapId={roadmap.roadmapId}
             currentSession={
-              roadmap.sessionData?.result?.[roadmap.achieved]?.topic || '진행중인 세션 없음'
+              roadmap.sessionData?.[roadmap.achieved]?.topic || '진행중인 세션 없음'
             }
             nextSession={
-              roadmap.sessionData?.result?.[roadmap.achieved + 1]?.topic || '다음 세션 없음'
+              roadmap.sessionData?.[roadmap.achieved + 1]?.topic || '다음 세션 없음'
             }
             category={roadmap.roadmapName}
             daysLeft={
-              roadmap.sessionData?.result?.[0]
+              roadmap.sessionData?.[0]
                 ? Math.ceil(
-                    (new Date(roadmap.sessionData.result[0].deadline).getTime() -
-                      new Date(roadmap.sessionData.result[0].start_date).getTime()) /
+                    (new Date(roadmap.sessionData[0].deadline).getTime() -
+                      new Date(roadmap.sessionData[0].start_date).getTime()) /
                         (1000 * 60 * 60 * 24)
                   )
                 : 0
             }
             progress={roadmap.achieved}
-            maxProgress={roadmap.sessionData?.result?.length || 0}
+            maxProgress={roadmap.sessionData?.length || 0}
           />
         ))}
       </CardContainer>
