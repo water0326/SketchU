@@ -104,7 +104,7 @@ export class RoadmapService {
         throw new Error('No access token found');
       }
 
-      const response = await this.apiFetch(`/roadmap/getroadmap?roadmapId=${roadmapId}`, {
+      const response = await this.apiFetch(`/roadmap/getroadmap?roadmapID=${roadmapId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`
@@ -123,6 +123,7 @@ export class RoadmapService {
 
       const data = await response.json();
       data.sessionData = JSON.parse(data.sessionData);
+      
 
       return {
         success: true,

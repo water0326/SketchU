@@ -1,10 +1,10 @@
-interface UserEntity {
+export interface UserEntity {
   id: number;
   username: string;
   password: null;
 }
 
-interface SessionItem {
+export interface SessionItem {
   seq: number;
   topic: string;
   description: string;
@@ -14,7 +14,7 @@ interface SessionItem {
 }
 
 
-interface RoadmapData {
+export interface RoadmapData {
   roadmapId: number;
   userEntity: UserEntity;
   achieved: number;

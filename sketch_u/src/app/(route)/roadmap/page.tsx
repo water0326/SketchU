@@ -5,6 +5,8 @@ import React, { useEffect, useState } from 'react';
 import ProfileButton from '@/app/_components/profile';
 import NewRoadmap from '@/app/_components/newRoadmap';
 import { RoadmapService } from '@/services/roadmapService';
+import { RoadmapListResponse } from '@/types/roadmap';
+import type { SessionItem } from '@/types/roadmap';
 import { useRouter } from 'next/navigation';
 
 const Container = styled.div`
@@ -384,25 +386,12 @@ interface UserEntity {
   password: null;
 }
 
-interface SessionItem {
-  seq: number;
-  topic: string;
-  description: string;
-  start_date: string;
-  deadline: string;
-  note: string | null;
-}
-
-interface SessionData {
-  result: SessionItem[];
-}
-
 interface RoadmapData {
   roadmapId: number;
   userEntity: UserEntity;
   achieved: number;
   clear: boolean;
-  sessionData: SessionData;
+  sessionData: SessionItem[];
 }
 
 // API 호출을 위한 함수 추가
@@ -429,13 +418,20 @@ const updateRoadmap = async (updatedData: RoadmapData) => {
 // Add the saveRoadmap function
 const saveRoadmap = async (updatedData: RoadmapData) => {
   try {
+    console.log({
+      ...updatedData,
+      sessionData: JSON.stringify(updatedData.sessionData)
+    });
     const response = await RoadmapService.apiFetch('/roadmap/saveroadmap', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
       },
-      body: JSON.stringify(updatedData),
+      body: JSON.stringify({
+        ...updatedData,
+        sessionData: JSON.stringify(updatedData.sessionData)
+      }),
     });
 
     if (!response.ok) {
@@ -466,8 +462,7 @@ export default function HomePage() {
     },
     achieved: 3,
     clear: false,
-    sessionData: {
-      result: [
+    sessionData: [
         {
           seq: 1,
           topic: "기타 구매하기",
@@ -517,7 +512,6 @@ export default function HomePage() {
           note: null
         }
       ]
-    }
   };
 
   const [roadmapData, setRoadmapData] = useState<RoadmapData | null>(null);
@@ -536,7 +530,10 @@ export default function HomePage() {
       const result = await RoadmapService.getRoadmap(parseInt(roadmapId));
       
       if (result.success && result.data) {
-        setRoadmapData(result.data);
+        setRoadmapData({
+          ...result.data,
+          sessionData: Array.isArray(result.data.sessionData) ? result.data.sessionData : []
+        });
       } else {
         if (result.error === 'Unauthorized') {
           router.push('/login');
@@ -563,12 +560,10 @@ export default function HomePage() {
     
     const newData = {
       ...roadmapData,
-      sessionData: {
-        ...roadmapData.sessionData,
-        result: roadmapData.sessionData.result.map((session, index) => 
+      sessionData: Array.isArray(roadmapData.sessionData) ? 
+        roadmapData.sessionData.map((session, index) => 
           index === selectedSession ? { ...session, note } : session
-        )
-      }
+        ) : []
     };
     
     setRoadmapData(newData);
@@ -577,10 +572,10 @@ export default function HomePage() {
 
   const handleEditClick = () => {
     if (selectedSession !== null) {
-      setEditedTopic(roadmapData.sessionData.result[selectedSession].topic);
-      setEditedDescription(roadmapData.sessionData.result[selectedSession].description);
-      setEditedStartDate(roadmapData.sessionData.result[selectedSession].start_date);
-      setEditedDeadline(roadmapData.sessionData.result[selectedSession].deadline);
+      setEditedTopic(roadmapData.sessionData[selectedSession].topic);
+      setEditedDescription(roadmapData.sessionData[selectedSession].description);
+      setEditedStartDate(roadmapData.sessionData[selectedSession].start_date);
+      setEditedDeadline(roadmapData.sessionData[selectedSession].deadline);
       setIsEditing(true);
     }
   };
@@ -600,7 +595,8 @@ export default function HomePage() {
       return;
     }
 
-    let updatedSessions = [...roadmapData.sessionData.result];
+    let updatedSessions = Array.isArray(roadmapData.sessionData) ? 
+      [...roadmapData.sessionData] : [];
     let adjustmentsMade = false;
 
     // 이전 세션들 재귀적 조정
@@ -653,7 +649,7 @@ export default function HomePage() {
       }
     };
 
-    // 이전 세션들 조정
+    // 전 세션들 조정
     adjustPreviousSessions(selectedSession, editedStartDate);
 
     // 다음 세션들 조정
@@ -670,10 +666,7 @@ export default function HomePage() {
 
     const newData = {
       ...roadmapData,
-      sessionData: {
-        ...roadmapData.sessionData,
-        result: updatedSessions
-      }
+      sessionData: updatedSessions
     };
 
     setRoadmapData(newData);
@@ -696,7 +689,7 @@ export default function HomePage() {
       setRoadmapData(newData);
       await saveRoadmap(newData);
       
-      if (selectedSession < roadmapData.sessionData.result.length - 1) {
+      if (selectedSession < roadmapData.sessionData.length - 1) {
         setSelectedSession(selectedSession + 1);
       }
       setIsEditing(false);
@@ -717,7 +710,8 @@ export default function HomePage() {
     if (selectedSession === null) return;
     
     const newSession: SessionItem = {
-      seq: roadmapData.sessionData.result[selectedSession].seq + 1,
+      seq: Array.isArray(roadmapData.sessionData) ? 
+        roadmapData.sessionData[selectedSession].seq + 1 : 1,
       topic: "새로운 세션",
       description: "설명을 입력하세요",
       start_date: "2024-04-21",
@@ -727,10 +721,11 @@ export default function HomePage() {
     
     setRoadmapData(prev => {
       if (!prev) return null;
+      const currentSessions = Array.isArray(prev.sessionData) ? prev.sessionData : [];
       const updatedSessions = [
-        ...prev.sessionData.result.slice(0, selectedSession + 1),
+        ...currentSessions.slice(0, selectedSession + 1),
         newSession,
-        ...prev.sessionData.result.slice(selectedSession + 1).map(session => ({
+        ...currentSessions.slice(selectedSession + 1).map(session => ({
           ...session,
           seq: session.seq + 1
         }))
@@ -738,10 +733,7 @@ export default function HomePage() {
       
       return {
         ...prev,
-        sessionData: {
-          ...prev.sessionData,
-          result: updatedSessions
-        }
+        sessionData: updatedSessions
       };
     });
 
@@ -760,8 +752,8 @@ export default function HomePage() {
     
     setRoadmapData(prev => {
       if (!prev) return null;
-      const updatedSessions = prev.sessionData.result.filter((_, index) => index !== selectedSession);
-      // 세션 번호 재정렬
+      const currentSessions = Array.isArray(prev.sessionData) ? prev.sessionData : [];
+      const updatedSessions = currentSessions.filter((_, index) => index !== selectedSession);
       const reorderedSessions = updatedSessions.map((session, index) => ({
         ...session,
         seq: index + 1
@@ -769,10 +761,7 @@ export default function HomePage() {
       
       return {
         ...prev,
-        sessionData: {
-          ...prev.sessionData,
-          result: reorderedSessions
-        },
+        sessionData: reorderedSessions,
         achieved: selectedSession < prev.achieved ? prev.achieved - 1 : prev.achieved
       };
     });
@@ -792,7 +781,7 @@ export default function HomePage() {
           <RoadmapTitle>일렉기타</RoadmapTitle>
           <Divider />
           <SessionList>
-            {roadmapData.sessionData.result.map((session, index) => (
+            {roadmapData.sessionData.map((session, index) => (
               <SessionItem
                 key={index}
                 status={
@@ -838,10 +827,10 @@ export default function HomePage() {
                     <>
                       <CancelEditButton onClick={() => {
                         setIsEditing(false);
-                        setEditedTopic(roadmapData.sessionData.result[selectedSession].topic);
-                        setEditedDescription(roadmapData.sessionData.result[selectedSession].description);
-                        setEditedStartDate(roadmapData.sessionData.result[selectedSession].start_date);
-                        setEditedDeadline(roadmapData.sessionData.result[selectedSession].deadline);
+                        setEditedTopic(roadmapData.sessionData[selectedSession].topic);
+                        setEditedDescription(roadmapData.sessionData[selectedSession].description);
+                        setEditedStartDate(roadmapData.sessionData[selectedSession].start_date);
+                        setEditedDeadline(roadmapData.sessionData[selectedSession].deadline);
                       }}>
                         <img src="/icons/cancel.svg" alt="cancel" />
                       </CancelEditButton>
@@ -876,10 +865,10 @@ export default function HomePage() {
                       }}
                     />
                   ) : (
-                    (roadmapData.sessionData.result[selectedSession].seq < 10 ? '0' : '') + 
-                    roadmapData.sessionData.result[selectedSession].seq + 
+                    (roadmapData.sessionData[selectedSession].seq < 10 ? '0' : '') + 
+                    roadmapData.sessionData[selectedSession].seq + 
                     ' ' + 
-                    roadmapData.sessionData.result[selectedSession].topic
+                    roadmapData.sessionData[selectedSession].topic
                   )}
                 </HeaderTitle>
                 <DateContainer>
@@ -899,7 +888,7 @@ export default function HomePage() {
                         }}
                       />
                     ) : (
-                      roadmapData.sessionData.result[selectedSession].start_date
+                      roadmapData.sessionData[selectedSession].start_date
                     )}
                   </div>
                   <div>
@@ -918,7 +907,7 @@ export default function HomePage() {
                         }}
                       />
                     ) : (
-                      roadmapData.sessionData.result[selectedSession].deadline
+                      roadmapData.sessionData[selectedSession].deadline
                     )}
                   </div>
                 </DateContainer>
@@ -939,12 +928,12 @@ export default function HomePage() {
                     }}
                   />
                 ) : (
-                  <p>{roadmapData.sessionData.result[selectedSession].description}</p>
+                  <p>{roadmapData.sessionData[selectedSession].description}</p>
                 )}
                 <ContentDivider />
                 <MemoTitle>메모</MemoTitle>
                 <MemoContent
-                  value={roadmapData.sessionData.result[selectedSession].note || ''}
+                  value={roadmapData.sessionData[selectedSession].note || ''}
                   onChange={(e) => handleNoteChange(e.target.value)}
                   placeholder="메모를 입력하세요"
                 />
