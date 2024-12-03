@@ -30,15 +30,22 @@ const Roadmap: React.FC = () => {
       const result = await RoadmapService.getAllRoadmaps();
       
       if (result.success && result.data) {
+        const processedData = result.data.map(roadmap => ({
+          ...roadmap,
+          sessionData: typeof roadmap.sessionData === 'string' 
+            ? JSON.parse(roadmap.sessionData)
+            : roadmap.sessionData
+        }));
+
         if (roadmapId) {
-          const selectedRoadmap = result.data.find(
+          const selectedRoadmap = processedData.find(
             (roadmap) => roadmap.roadmapId === Number(roadmapId)
           );
           if (selectedRoadmap) {
             setRoadmapData([selectedRoadmap]);
           }
         } else {
-          setRoadmapData(result.data);
+          setRoadmapData(processedData);
         }
       } else {
         if (result.error === 'Unauthorized') {
