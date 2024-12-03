@@ -30,22 +30,15 @@ const Roadmap: React.FC = () => {
       const result = await RoadmapService.getAllRoadmaps();
       
       if (result.success && result.data) {
-        const processedData = result.data.map(roadmap => ({
-          ...roadmap,
-          sessionData: typeof roadmap.sessionData === 'string' 
-            ? JSON.parse(roadmap.sessionData)
-            : roadmap.sessionData
-        }));
-
         if (roadmapId) {
-          const selectedRoadmap = processedData.find(
+          const selectedRoadmap = result.data.find(
             (roadmap) => roadmap.roadmapId === Number(roadmapId)
           );
           if (selectedRoadmap) {
             setRoadmapData([selectedRoadmap]);
           }
         } else {
-          setRoadmapData(processedData);
+          setRoadmapData(result.data);
         }
       } else {
         if (result.error === 'Unauthorized') {
@@ -85,11 +78,15 @@ const Roadmap: React.FC = () => {
           <RoadmapCard
             key={roadmap.roadmapId}
             roadmapId={roadmap.roadmapId}
-            currentSession={roadmap.sessionData.result[roadmap.achieved]?.topic || ''}
-            nextSession={roadmap.sessionData.result[roadmap.achieved+1]?.topic || ''}
+            currentSession={
+              roadmap.sessionData?.result?.[roadmap.achieved]?.topic || '진행중인 세션 없음'
+            }
+            nextSession={
+              roadmap.sessionData?.result?.[roadmap.achieved + 1]?.topic || '다음 세션 없음'
+            }
             category={roadmap.roadmapName}
             daysLeft={
-              roadmap.sessionData.result[0]
+              roadmap.sessionData?.result?.[0]
                 ? Math.ceil(
                     (new Date(roadmap.sessionData.result[0].deadline).getTime() -
                       new Date(roadmap.sessionData.result[0].start_date).getTime()) /
@@ -98,7 +95,7 @@ const Roadmap: React.FC = () => {
                 : 0
             }
             progress={roadmap.achieved}
-            maxProgress={roadmap.sessionData.result.length}
+            maxProgress={roadmap.sessionData?.result?.length || 0}
           />
         ))}
       </CardContainer>

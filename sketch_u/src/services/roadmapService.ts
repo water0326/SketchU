@@ -31,13 +31,26 @@ export class RoadmapService {
       }
 
       const data = await response.json();
-      data.forEach((item: any) => {
-        item.sessionData = JSON.parse(item.sessionData);
+      const parsedData = data.map((item: any) => {
+        try {
+          return {
+            ...item,
+            sessionData: typeof item.sessionData === 'string' 
+              ? JSON.parse(item.sessionData)
+              : item.sessionData
+          };
+        } catch (e) {
+          console.error('Failed to parse sessionData:', e);
+          return {
+            ...item,
+            sessionData: { result: [] }
+          };
+        }
       });
 
       return {
         success: true,
-        data
+        data: parsedData
       };
     } catch (error) {
       console.error('Failed to fetch roadmaps:', error);
