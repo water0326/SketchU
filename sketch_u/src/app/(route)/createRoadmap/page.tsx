@@ -347,6 +347,34 @@ const StartDateInput = styled.input`
   }
 `;
 
+// styled-components 추가
+const LoadingOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const LoadingSpinner = styled.div`
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #76c7c0;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
 const StudyForm: React.FC = () => {
   const [movedUp, setMovedUp] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -379,9 +407,12 @@ const StudyForm: React.FC = () => {
     }>;
     editingId?: number;
   }>({ items: [] });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleButtonClick = async () => {
     if (inputValue.trim() === '') return;
+    
+    setIsLoading(true); // 로딩 시작
     
     try {
       const response = await RoadmapService.apiFetch(`/roadmap/createroadmap?topic=${encodeURIComponent(inputValue)}`, {
@@ -438,6 +469,8 @@ const StudyForm: React.FC = () => {
       const adjustedItems = adjustDatesToStartDate(newRoadmapItems, startDate);
       setRoadmapItems(adjustedItems);
       setMovedUp(true);
+    } finally {
+      setIsLoading(false); // 로딩 종료
     }
   };
 
@@ -622,6 +655,11 @@ const StudyForm: React.FC = () => {
 
   return (
     <StudyContainer $movedUp={movedUp}>
+      {isLoading && (
+        <LoadingOverlay>
+          <LoadingSpinner />
+        </LoadingOverlay>
+      )}
       <ProfileButton />
       <NewRoadmap />
       {!movedUp ? (
