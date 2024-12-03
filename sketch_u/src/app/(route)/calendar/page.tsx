@@ -87,7 +87,13 @@ export default function Timeline() {
       const result = await RoadmapService.getAllRoadmaps();
       
       if (result.success && result.data) {
-        setTimelineData({ timelines: result.data });
+        const transformedData = result.data.map(roadmap => ({
+          ...roadmap,
+          sessionData: {
+            result: roadmap.sessionData
+          }
+        }));
+        setTimelineData({ timelines: transformedData });
       } else {
         // If API call fails, use mock data
         const mockData: RoadmapData[] = [
@@ -252,34 +258,53 @@ export default function Timeline() {
     fetchRoadmaps();
   }, [])
 
-  useEffect(() => {
-    const { minDate } = getDateRange();
-    const today = new Date();
-    const daysSinceStart = Math.floor((today.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
-    setCurrentDatePosition(daysSinceStart * dayWidth);
-  }, [timelineData, dayWidth]);
-
-  // 전체 날짜 범위 계산을 위한 함수 추가
   const getDateRange = () => {
+    if (!timelineData?.timelines?.length) {
+      return {
+        minDate: new Date(),
+        maxDate: new Date()
+      };
+    }
+
     let minDate = new Date();
     let maxDate = new Date();
+    let hasValidDates = false;
 
     timelineData.timelines.forEach(timeline => {
+      if (!timeline?.sessionData?.result) return;
+      
       timeline.sessionData.result.forEach(item => {
         const startDate = new Date(item.start_date);
         const endDate = new Date(item.deadline);
-        if (startDate < minDate) minDate = startDate;
-        if (endDate > maxDate) maxDate = endDate;
+
+        if (!hasValidDates) {
+          minDate = startDate;
+          maxDate = endDate;
+          hasValidDates = true;
+        } else {
+          if (startDate < minDate) minDate = startDate;
+          if (endDate > maxDate) maxDate = endDate;
+        }
       });
     });
 
     return { minDate, maxDate };
   };
 
-  const { minDate, maxDate } = getDateRange();
+  useEffect(() => {
+    const { minDate } = getDateRange();
+    if (!minDate) return;
+    
+    const today = new Date();
+    const daysSinceStart = Math.floor((today.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+    setCurrentDatePosition(daysSinceStart * dayWidth);
+  }, [timelineData, dayWidth]);
 
   // 특정 날짜의 위치를 계산하는 함수 추가
   const calculateSpecificDatePosition = (dateString: string) => {
+    const { minDate } = getDateRange();
+    if (!minDate) return 0;
+    
     const specificDate = new Date(dateString);
     const daysSinceStart = Math.floor((specificDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
     return daysSinceStart * dayWidth;
@@ -308,11 +333,12 @@ export default function Timeline() {
           {timelineData.timelines.map((timeline) => {
             const firstStartDate = timeline.sessionData.result[0]?.start_date;
             const startDate = new Date(firstStartDate);
-            const daysSinceStart = Math.floor((startDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+            const { minDate } = getDateRange();
+            const daysSinceStart = minDate ? Math.floor((startDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24)) : 0;
             const marginLeft = daysSinceStart * dayWidth;
 
             return (
-              <TimelineWrapper 
+              <TimelineWrapper
                 key={timeline.roadmapId} 
                 style={{ 
                   marginLeft: `${marginLeft}px`, 
