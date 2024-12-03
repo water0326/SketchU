@@ -9,23 +9,14 @@ import NewRoadmap from '@/app/_components/newRoadmap';
 import { RoadmapService } from '@/services/roadmapService';
 import { RoadmapListResponse } from '@/types/roadmap';
 
-// RoadmapData 인터페이스 추가
-interface TimelineItem {
-  seq: number;
-  topic: string;
-  description: string;
-  start_date: string;
-  deadline: string;
-  note: string | null;
-}
 
 const Roadmap: React.FC = () => {
   const [roadmapData, setRoadmapData] = useState<RoadmapListResponse[]>([]);
   const [sortOption, setSortOption] = useState<string>("deadline");
   const [showOnlyInProgress, setShowOnlyInProgress] = useState(false);
   const router = useRouter();
-  const searchParams = new URLSearchParams(window.location.search);
-  const roadmapId = searchParams.get('roadmapId');
+  const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null);
+  const roadmapId = searchParams?.get('roadmapId') || null;
   const [isLoading, setIsLoading] = useState(true);
 
   const sortRoadmaps = (data: RoadmapListResponse[], option: string) => {
@@ -51,6 +42,10 @@ const Roadmap: React.FC = () => {
       }
     });
   };
+
+  useEffect(() => {
+    setSearchParams(new URLSearchParams(window.location.search));
+  }, []);
 
   useEffect(() => {
     const fetchRoadmaps = async () => {
