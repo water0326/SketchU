@@ -391,6 +391,7 @@ interface RoadmapData {
   userEntity: UserEntity;
   achieved: number;
   clear: boolean;
+  roadmapName: string;
   sessionData: SessionItem[];
 }
 
@@ -422,8 +423,8 @@ const saveRoadmap = async (updatedData: RoadmapData) => {
       ...updatedData,
       sessionData: JSON.stringify(updatedData.sessionData)
     });
-    const response = await RoadmapService.apiFetch('/roadmap/saveroadmap', {
-      method: 'POST',
+    const response = await RoadmapService.apiFetch('/roadmap/updateroadmap', {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
@@ -455,6 +456,7 @@ export default function HomePage() {
 
   const initialRoadmapData: RoadmapData = {
     roadmapId: 1,
+    roadmapName: "일렉기타",
     userEntity: {
       id: 1,
       username: "testUser",
@@ -778,7 +780,7 @@ export default function HomePage() {
       <PageName>내 로드맵</PageName>
       <ContentContainer>
         <Sidebar>
-          <RoadmapTitle>일렉기타</RoadmapTitle>
+          <RoadmapTitle>{roadmapData.roadmapName}</RoadmapTitle>
           <Divider />
           <SessionList>
             {roadmapData.sessionData.map((session, index) => (
