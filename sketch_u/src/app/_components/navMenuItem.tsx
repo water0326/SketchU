@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { colors } from "../utils/colorSheet";
 
 interface MenuItemProps {
   iconSrc: string;
@@ -7,21 +8,31 @@ interface MenuItemProps {
   onclick: () => void;
 }
 
-const SELECTED_COLOR = "#E8FFF7";
-
 const MenuItemContainer = styled.div<{ $isSelected: boolean }>`
   display: flex;
   align-items: center;
   cursor: pointer;
   width: 191px;
   height: 48px;
-  background-color: ${(props) => (props.$isSelected ? SELECTED_COLOR : "#e8fff700")};
+  background-color: ${(props) => 
+    props.$isSelected 
+      ? colors.navigation.menuItem.background.selected 
+      : colors.navigation.menuItem.background.default
+  };
   border-radius: 50px;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
-  color: #1a1a1a;
+  color: ${colors.navigation.menuItem.text.default};
   &:hover {
-    background-color: ${(props) => (props.$isSelected ? SELECTED_COLOR : "#e8fff7aa")};
-    color: ${(props) => (props.$isSelected ? "#1a1a1a" : "#000000")};
+    background-color: ${(props) => 
+      props.$isSelected 
+        ? colors.navigation.menuItem.background.selected 
+        : colors.navigation.menuItem.background.hover
+    };
+    color: ${(props) => 
+      props.$isSelected 
+        ? colors.navigation.menuItem.text.default 
+        : colors.navigation.menuItem.text.hover
+    };
   }
 `;
 

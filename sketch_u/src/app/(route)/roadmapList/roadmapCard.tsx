@@ -4,6 +4,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
+import { colors } from '@/app/utils/colorSheet';
 
 type RoadmapCardProps = {
   currentSession: string;
@@ -58,9 +59,9 @@ const Card = styled.div<{ $clear: boolean }>`
   width: 334px;
   height: 233px;
   margin: 19px;
-  background: ${props => props.$clear ? '#E5E5E5' : '#F6F9F3'};
+  background: ${props => props.$clear ? colors.roadmapCard.backgroundClear : colors.roadmapCard.background};
   border-radius: 13px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 4px 12px ${colors.roadmapCard.shadow};
   display: flex;
   justify-content: start;
   align-items: center;
@@ -72,8 +73,8 @@ const Card = styled.div<{ $clear: boolean }>`
   
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
-    background: ${props => props.$clear ? '#DADADA' : '#F0F5EC'};
+    box-shadow: 0px 6px 15px ${colors.roadmapCard.hoverShadow};
+    background: ${props => props.$clear ? colors.roadmapCard.hoverBackgroundClear : colors.roadmapCard.hoverBackground};
   }
 `;
 
@@ -93,7 +94,7 @@ const ProgressBar = styled.div`
 const ProgressIndicator = styled.div<{ active: boolean }>`
   flex: 1;
   height: 100%;
-  background-color: ${(props) => (props.active ? '#90D8BF' : '#e0e0e0')};
+  background-color: ${(props) => (props.active ? colors.roadmapCard.progressBar.active : colors.roadmapCard.progressBar.inactive)};
   border-radius: 7px;
   &:not(:last-child) {
     margin-right: 6px;
@@ -114,7 +115,7 @@ const Title = styled.h3`
   margin: 0;
   font-size: 21px;
   font-weight: 500;
-  color: #2B2B2B;
+  color: ${colors.roadmapCard.text.title};
   margin-bottom: 5px;
   white-space: nowrap;
   overflow: hidden;
@@ -123,7 +124,7 @@ const Title = styled.h3`
 `;
 
 const Subtitle = styled.p`
-  color: #1C1C1C;
+  color: ${colors.roadmapCard.text.subtitle};
   font-size: 14px;
   font-weight: 400;
   white-space: nowrap;
@@ -150,7 +151,7 @@ const Category = styled.span`
   margin-top: 8px;
   font-size: 17px;
   font-weight: 500;
-  color: #000000;
+  color: ${colors.roadmapCard.text.category};
 `;
 
 const DaysLeft = styled.span`
@@ -158,7 +159,7 @@ const DaysLeft = styled.span`
   margin-top: 4px;
   font-weight: 600;
   font-size: 12px;
-  color: #2792DF;
+  color: ${colors.roadmapCard.text.daysLeft};
 `;
 
 const CompleteIcon = styled.img`

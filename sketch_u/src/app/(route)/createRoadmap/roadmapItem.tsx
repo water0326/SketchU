@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { colors } from '@/app/utils/colorSheet';
 
 type RoadMapItemProps = {
   number: number;
@@ -23,15 +24,17 @@ const Container = styled.div`
   align-items: center;
   margin-bottom: 20px;
   padding: 10px;
-  background-color: #f0f4f8;
+  background-color: ${colors.roadmap.item.container};
   border-radius: 15px;
+  transition: background-color 0.3s ease;
 `;
 
 const RoadMapItemContainer = styled.div<{ $isEditing: boolean }>`
   width: 600px;
   min-height: 120px;
   height: auto;
-  background-color: ${({ $isEditing }) => ($isEditing ? '#e0f7fa' : '#ffffff')};
+  background-color: ${({ $isEditing }) => 
+    $isEditing ? colors.roadmap.item.editingBackground : colors.roadmap.item.background};
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
@@ -48,20 +51,21 @@ const NameContainer = styled.div<{ $isEditing: boolean }>`
   border-radius: 10px;
   
   width: auto;
-  background-color: ${({ $isEditing }) => ($isEditing ? '#FFFFFF' : 'transparent')};
+  background-color: ${({ $isEditing }) => 
+    $isEditing ? colors.roadmap.item.background : 'transparent'};
 `;
 
 const ItemNumber = styled.div`
   font-size: 28px;
   font-weight: bold;
-  color: #333;
+  color: ${colors.roadmap.item.number};
   margin-right: 10px;
 `;
 
 const ItemName = styled.div`
   font-size: 24px;
   font-weight: bold;
-  color: #333;
+  color: ${colors.roadmap.item.name};
 `;
 
 const EditableInput = styled.input`
@@ -69,16 +73,21 @@ const EditableInput = styled.input`
   width: 100%;
   font-size: 24px;
   font-weight: bold;
-  color: #333;
-  border: 1px solid #ddd;
+  color: ${colors.roadmap.item.name};
+  border: 1px solid ${colors.roadmap.dateInput.border};
   border-radius: 8px;
-  background-color: transparent;
+  background-color: ${colors.roadmap.item.background};
   outline: none;
+  transition: border-color 0.3s ease;
+  
+  &:focus {
+    border-color: ${colors.roadmap.dateInput.borderFocus};
+  }
 `;
 
 const ItemDescription = styled.div`
   font-size: 18px;
-  color: #525252;
+  color: ${colors.roadmap.item.description};
   font-weight: 400;
   margin-left: 21px;
 `;
@@ -97,14 +106,19 @@ const EditableTextArea = styled.textarea<{ $isEditing: boolean }>`
   padding: 12px;
   width: 100%;
   font-size: 18px;
-  color: #555;
+  color: ${colors.roadmap.item.description};
   font-weight: 400;
-  border: 1px solid #ddd;
-  background-color: ${({ $isEditing }) => ($isEditing ? '#ffffff' : 'transparent')};
+  border: 1px solid ${colors.roadmap.dateInput.border};
+  background-color: ${colors.roadmap.item.background};
   outline: none;
   resize: none;
   border-radius: 10px;
   overflow: hidden;
+  transition: border-color 0.3s ease;
+  
+  &:focus {
+    border-color: ${colors.roadmap.dateInput.borderFocus};
+  }
 `;
 
 const ItemImage = styled.img`
@@ -124,20 +138,20 @@ const DateContainer = styled.div`
 
 const DateInfo = styled.div`
   font-size: 14px;
-  color: #666;
+  color: ${colors.roadmap.item.date};
 `;
 
 const DateInput = styled.input`
   padding: 5px;
   margin: 0 5px;
-  border: 1px solid #ddd;
+  border: 1px solid ${colors.roadmap.dateInput.border};
   border-radius: 5px;
-  background-color: white;
+  background-color: ${colors.roadmap.item.dateInput.background};
   font-size: 14px;
-  color: #666;
+  color: ${colors.roadmap.item.date};
 
   &:invalid {
-    border-color: #ff6b6b;
+    border-color: ${colors.roadmap.item.dateInput.invalidBorder};
   }
 `;
 

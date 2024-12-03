@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 import ProfileButton from '@/app/_components/profile';
 import { RoadmapService } from '@/services/roadmapService';
+import { colors } from '@/app/utils/colorSheet';
 
 const Container = styled.div`
   width: 100%;
@@ -28,7 +29,7 @@ const SignUpBox = styled.div`
 const Title = styled.h1`
   font-size: 24px;
   font-weight: 600;
-  color: #333;
+  color: ${colors.auth.title};
   margin-bottom: 32px;
   text-align: center;
 `;
@@ -59,25 +60,25 @@ const Input = styled.input`
   width: 482px;
   height: 50px;
   padding: 0 16px;
-  border: 1px solid #E5E5E5;
+  border: 1px solid ${colors.auth.input.border};
   border-radius: 25px;
   font-size: 15px;
-  background: #F6F9F3;
-  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.15);
+  background: ${colors.auth.input.background};
+  box-shadow: inset 0 3px 8px ${colors.auth.input.shadow};
   transition: all 0.2s ease;
 
   &:focus {
-    border-color: #90D8BF;
-    background: white;
+    border-color: ${colors.auth.input.focusBorder};
+    background: ${colors.white};
   }
 
   &::placeholder {
-    color: #999;
+    color: ${colors.auth.input.placeholder};
   }
 `;
 
 const ErrorMessage = styled.span`
-  color: #FF4444;
+  color: ${colors.auth.error};
   font-size: 13px;
   margin-top: 6px;
   margin-left: 16px;
@@ -88,18 +89,18 @@ const SignUpButton = styled.button`
   width: 482px;
   height: 50px;
   margin-top: 35px;
-  background: #90D8BF;
+  background: ${colors.auth.button.primary.background};
   border: none;
   border-radius: 25px;
-  color: black;
+  color: ${colors.auth.button.primary.text};
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 3px 8px ${colors.auth.input.shadow};
 
   &:hover {
-    background: #7EC5AD;
+    background: ${colors.auth.button.primary.hover};
   }
 `;
 
@@ -107,17 +108,17 @@ const LoginLink = styled.button`
   width: 482px;
   height: 50px;
   margin-top: 18px;
-  background: #F6F9F3;
+  background: ${colors.auth.button.secondary.background};
   border-radius: 25px;
-  color: #666;
+  color: ${colors.auth.button.secondary.text};
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 3px 8px ${colors.auth.input.shadow};
 
   &:hover {
-    background: #EDF3EA;
+    background: ${colors.auth.button.secondary.hover};
   }
 `;
 

@@ -1,11 +1,12 @@
 import React from "react";
 import styled from "styled-components";
 import { useRouter } from "next/navigation";
+import { colors } from "../utils/colorSheet";
 
 const Button = styled.button`
   position: absolute;
   right: 60px;
-  background-color: #90D8BF;
+  background-color: ${colors.roadmapPage.button.primary};
   border: none;
   border-radius: 50%;
   width: 44px;
@@ -19,7 +20,7 @@ const Button = styled.button`
   z-index: 100;
 
   &:hover {
-    background-color: #A8E4D0;
+    background-color: ${colors.roadmapPage.button.primaryHover};
     transform: translateY(-2px);
     filter: drop-shadow(1px 4px 6px rgba(0, 0, 0, 0.25));
     
@@ -35,13 +36,13 @@ const Tooltip = styled.div`
   position: absolute;
   right: 45px;
   top: 55px;
-  background-color: #FFFFFF;
+  background-color: ${colors.white};
   padding: 8px 12px;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
-  color: #333333;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: ${colors.text.primary};
+  box-shadow: 0 4px 12px ${colors.tooltip.shadow};
   opacity: 0;
   visibility: hidden;
   transform: translateY(-10px);
@@ -58,7 +59,7 @@ const Tooltip = styled.div`
     height: 0;
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-bottom: 6px solid #FFFFFF;
+    border-bottom: 6px solid ${colors.tooltip.arrow};
   }
 `;
 

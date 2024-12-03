@@ -7,6 +7,7 @@ import RoadMapItem from './roadmapItem';
 import NewRoadmap from '@/app/_components/newRoadmap';
 import { useRouter } from 'next/navigation';
 import { RoadmapService } from '@/services/roadmapService';
+import { colors } from '@/app/utils/colorSheet';
 
 const StudyContainer = styled.div<{ $movedUp: boolean }>`
   display: flex;
@@ -20,7 +21,7 @@ const StudyContainer = styled.div<{ $movedUp: boolean }>`
 const Question = styled.h2<{ $movedUp: boolean }>`
   margin-bottom: 64px;
   font-size: 30px;
-  color: #333;
+  color: ${colors.roadmap.text};
   font-weight: 400;
   transition: margin-top font-size 0.6s ease;
 
@@ -44,7 +45,7 @@ const Description = styled.div<{ $movedUp: boolean }>`
   align-items: center;
   flex-direction: column;
   font-size: 18px;
-  color: #383838;
+  color: ${colors.roadmap.textSecondary};
   font-weight: 400;
   transition: opacity 1s ease;
 
@@ -57,7 +58,7 @@ const Description = styled.div<{ $movedUp: boolean }>`
 `;
 
 const DivisionLine = styled.div`
-  background-color: #afafaf;
+  background-color: ${() => colors.roadmap.divider};
   width: 100%;
   height: 2px;
   border-radius: 100;
@@ -74,7 +75,7 @@ const RoadMapContainer = styled.div<{ $movedUp: boolean }>`
   height: 0px;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: #76c7c0 transparent;
+  scrollbar-color: ${() => colors.roadmap.primary} transparent;
 
   ${({ $movedUp: movedUp }) =>
     movedUp &&
@@ -94,13 +95,13 @@ const RoadMapContainer = styled.div<{ $movedUp: boolean }>`
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #76c7c0;
+    background: ${() => colors.roadmap.primary};
     border-radius: 50px;
     transition: background-color 0.3s ease;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: #63aea6;
+    background: ${() => colors.roadmap.primaryHover};
   }
 `;
 
@@ -132,17 +133,16 @@ const Input = styled.input`
   border-radius: 25px;
   outline: none;
   font-size: 1.1rem;
-  background-color: transparent;
+  background-color: ${() => colors.roadmap.inputBg};
   width: 774px;
   height: 50px;
-  background-color: #f6f9f3;
-  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0 3px 8px ${() => colors.roadmap.inputShadow};
   padding-left: 20px;
   padding-top: 2px;
 `;
 
 const Button = styled.button<{ $movedUp: boolean }>`
-  background-color: #76c7c0;
+  background-color: ${() => colors.roadmap.primary};
   border: none;
   border-radius: 50%;
   width: 50px;
@@ -156,7 +156,7 @@ const Button = styled.button<{ $movedUp: boolean }>`
   filter: drop-shadow(1px 3px 5px rgba(0, 0, 0, 0.2));
 
   &:hover {
-    background-color: #63aea6;
+    background-color: ${() => colors.roadmap.primaryHover};
   }
 `;
 
@@ -169,20 +169,22 @@ const NewButtonsContainer = styled.div`
 const NewButton = styled.button<{ isResetButton?: boolean }>`
   width: 122px;
   height: 50px;
-  background-color: ${({ isResetButton }) => (isResetButton ? '#E9E9E9' : '#76c7c0')};
+  background-color: ${({ isResetButton }) => 
+    isResetButton ? colors.roadmap.secondary : colors.roadmap.primary};
   border: none;
   border-radius: 25px;
   margin-left: 17px;
   padding: 10px 20px;
   font-size: 17px;
-  color: #141414;
+  color: ${() => colors.roadmap.input.text};
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.3s ease;
   filter: drop-shadow(1px 3px 5px rgba(0, 0, 0, 0.2));
 
   &:hover {
-    background-color: ${({ isResetButton }) => (isResetButton ? '#d9d9d9' : '#63aea6')};
+    background-color: ${({ isResetButton }) => 
+    isResetButton ? colors.roadmap.secondaryHover : colors.roadmap.primaryHover};
   }
 `;
 
@@ -221,7 +223,7 @@ const DUMMY_ROADMAP_DATA = [
 const RoadmapTitle = styled.input`
   font-size: 23px;
   font-weight: 600;
-  color: #333;
+  color: ${() => colors.roadmap.title.text};
   border: none;
   background: transparent;
   text-align: center;
@@ -230,12 +232,12 @@ const RoadmapTitle = styled.input`
   padding: 5px;
   
   &:hover {
-    background-color: #f6f9f3;
+    background-color: ${() => colors.roadmap.title.hoverBg};
   }
   
   &:focus {
     outline: none;
-    background-color: #f6f9f3;
+    background-color: ${() => colors.roadmap.title.focusBg};
   }
 `;
 
@@ -259,7 +261,7 @@ const TimelineContainer = styled.div`
 
 const Timeline = styled.div`
   width: 4px;
-  background-color: #E9E9E9;
+  background-color: ${() => colors.roadmap.timeline.bg};
   height: 100%;
   position: relative;
   border-radius: 2px;
@@ -270,13 +272,13 @@ const SessionHandle = styled.div<{ $top: number, $height: number }>`
   left: -8px;
   width: 20px;
   height: ${props => props.$height}px;
-  background-color: #76c7c0;
+  background-color: ${() => colors.roadmap.timeline.handle};
   border-radius: 10px;
   top: ${props => props.$top}px;
   cursor: grab;
   
   &:hover {
-    background-color: #63aea6;
+    background-color: ${() => colors.roadmap.timeline.handleHover};
   }
   
   &:active {
@@ -331,19 +333,19 @@ const StartDateContainer = styled.div`
   gap: 10px;
   margin-bottom: 20px;
   font-size: 16px;
-  color: #383838;
+  color: ${() => colors.roadmap.dateInput.label};
 `;
 
 const StartDateInput = styled.input`
   padding: 5px 10px;
-  border: 1px solid #76c7c0;
+  border: 1px solid ${() => colors.roadmap.dateInput.border};
   border-radius: 5px;
   font-size: 16px;
-  color: #383838;
+  color: ${() => colors.roadmap.dateInput.text};
   
   &:focus {
     outline: none;
-    border-color: #63aea6;
+    border-color: ${() => colors.roadmap.dateInput.borderFocus};
   }
 `;
 
@@ -354,7 +356,7 @@ const LoadingOverlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.8);
+  background: ${() => colors.loading.overlay};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -364,8 +366,8 @@ const LoadingOverlay = styled.div`
 const LoadingSpinner = styled.div`
   width: 50px;
   height: 50px;
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid #76c7c0;
+  border: 5px solid ${() => colors.loading.spinner.border};
+  border-top: 5px solid ${() => colors.loading.spinner.active};
   border-radius: 50%;
   animation: spin 1s linear infinite;
 

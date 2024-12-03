@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 import ProfileButton from '@/app/_components/profile';
 import { RoadmapService } from '@/services/roadmapService';
+import { colors } from '@/app/utils/colorSheet';
 
 const Container = styled.div`
   width: 100%;
@@ -17,7 +18,7 @@ const Container = styled.div`
 const LoginBox = styled.div`
   width: 800px;
   padding: 32px;
-  background: white;
+  background: ${colors.white};
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -28,7 +29,7 @@ const LoginBox = styled.div`
 const Title = styled.h1`
   font-size: 24px;
   font-weight: 600;
-  color: #333;
+  color: ${colors.text.primary};
   margin-bottom: 32px;
   text-align: center;
 `;
@@ -59,21 +60,21 @@ const Input = styled.input`
   width: 482px;
   height: 50px;
   padding: 0 16px;
-  border: 1px solid #E5E5E5;
+  border: 1px solid ${colors.border};
   border-radius: 25px;
   font-size: 15px;
-  background: #F6F9F3;
-  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.15);
+  background: ${colors.roadmap.inputBg};
+  box-shadow: inset 0 3px 8px ${colors.roadmap.inputShadow};
   transition: all 0.2s ease;
 
   &:focus {
     outline: none;
-    border-color: #90D8BF;
-    background: white;
+    border-color: ${colors.current.background};
+    background: ${colors.white};
   }
 
   &::placeholder {
-    color: #999;
+    color: ${colors.text.secondary};
   }
 `;
 
@@ -81,18 +82,18 @@ const LoginButton = styled.button`
   width: 482px;
   height: 50px;
   margin-top: 35px;
-  background: #90D8BF;
+  background: ${colors.roadmapPage.button.primary};
   border: none;
   border-radius: 25px;
-  color: black;
+  color: ${colors.black};
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 
   &:hover {
-    background: #7EC5AD;
+    background: ${colors.roadmapPage.button.primaryHover};
   }
 `;
 
@@ -100,9 +101,9 @@ const SignUpButton = styled.button`
   width: 482px;
   height: 50px;
   margin-top: 18px;
-  background: #F6F9F3;
+  background: ${colors.button.background};
   border-radius: 25px;
-  color: #666;
+  color: ${colors.text.secondary};
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
@@ -110,7 +111,7 @@ const SignUpButton = styled.button`
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 
   &:hover {
-    background: #EDF3EA;
+    background: ${colors.button.hover};
   }
 `;
 

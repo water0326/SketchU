@@ -5,6 +5,7 @@ import ProfileButton from '@/app/_components/profile'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { RoadmapService } from '@/services/roadmapService';
+import { colors } from '@/app/utils/colorSheet'
 
 interface TimelineItem {
   seq: number
@@ -278,10 +279,12 @@ export default function Timeline() {
                   fontWeight: '500',
                   padding: '4px 8px',
                   borderRadius: '4px',
-                  backgroundColor: hoveredCard.status === 'completed' ? '#F0FFF4' : 
-                                  hoveredCard.status === 'current' ? '#EBF8FF' : '#F7FAFC',
-                  color: hoveredCard.status === 'completed' ? '#2F855A' : 
-                         hoveredCard.status === 'current' ? '#2B6CB0' : '#718096'
+                  backgroundColor: hoveredCard.status === 'completed' ? colors.badge.completed.background : 
+                                  hoveredCard.status === 'current' ? colors.badge.current.background : 
+                                  colors.badge.upcoming.background,
+                  color: hoveredCard.status === 'completed' ? colors.badge.completed.text : 
+                         hoveredCard.status === 'current' ? colors.badge.current.text : 
+                         colors.badge.upcoming.text,
                 }}>
                   {hoveredCard.status === 'completed' ? '완료' :
                    hoveredCard.status === 'current' ? '진행 중' : '예정'}
@@ -290,7 +293,19 @@ export default function Timeline() {
               <TooltipContent>
                 <div data-label="주제">{hoveredCard.topic}</div>
                 <div data-label="설명">{hoveredCard.description}</div>
-                <div data-label="기간">
+                <div 
+                  data-label="기간"
+                  data-days={(() => {
+                    const today = new Date();
+                    const deadline = new Date(hoveredCard.deadline);
+                    const diffTime = deadline.getTime() - today.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays <= 1) return "danger";
+                    if (diffDays <= 3) return "warning";
+                    return "normal";
+                  })()}
+                >
                   {(() => {
                     const today = new Date();
                     const deadline = new Date(hoveredCard.deadline);
@@ -369,11 +384,11 @@ const TimelineCard = styled.div<{
   background-color: ${props => {
     switch (props.$status) {
       case 'completed':
-        return '#F6F9F3';
+        return colors.completed.background;
       case 'current':
-        return '#90D8BF';
+        return colors.current.background;
       case 'upcoming':
-        return '#F2F2F2';
+        return colors.upcoming.background;
     }
   }};
   border-radius: 100px;
@@ -387,11 +402,11 @@ const TimelineCard = styled.div<{
   box-shadow: ${props => {
     switch (props.$status) {
       case 'completed':
-        return '0 2px 4px rgba(0, 0, 0, 0.1)';
+        return `0 2px 4px ${colors.completed.shadow}`;
       case 'current':
-        return '0 4px 8px rgba(0, 0, 0, 0.2)';
+        return `0 4px 8px ${colors.current.shadow}`;
       case 'upcoming':
-        return '0 1px 3px rgba(0, 0, 0, 0.08)';
+        return `0 1px 3px ${colors.upcoming.shadow}`;
     }
   }};
   transition: all 0.3s ease;
@@ -400,11 +415,11 @@ const TimelineCard = styled.div<{
     box-shadow: ${props => {
       switch (props.$status) {
         case 'completed':
-          return '0 4px 6px rgba(0, 0, 0, 0.15)';
+          return `0 4px 6px ${colors.completed.hoverShadow}`;
         case 'current':
-          return '0 6px 12px rgba(0, 0, 0, 0.25)';
+          return `0 6px 12px ${colors.current.hoverShadow}`;
         case 'upcoming':
-          return '0 2px 4px rgba(0, 0, 0, 0.12)';
+          return `0 2px 4px ${colors.upcoming.hoverShadow}`;
       }
     }};
     transform: translateY(-1px);
@@ -431,8 +446,8 @@ const TimelineContent = styled.div`
   position: relative;
   overflow-x: auto;
   height: 100%;
-  border-top: 1px solid #E0E0E0;
-  border-left: 1px solid #E0E0E0;
+  border-top: 1px solid ${colors.border};
+  border-left: 1px solid ${colors.border};
   cursor: grab;
   user-select: none;
   padding-top: 20px;
@@ -468,13 +483,13 @@ const ZoomControls = styled.div`
 
 const ZoomButton = styled.button`
   padding: 8px 20px;
-  background-color: #F6F9F3;
+  background-color: ${colors.button.background};
   border: none;
   border-radius: 25px;
   cursor: pointer;
   font-size: 16px;
   font-weight: 500;
-  color: #3C3C3C;
+  color: ${colors.button.text};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -482,8 +497,8 @@ const ZoomButton = styled.button`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
   &:hover {
-    background-color: #90D8BF;
-    color: #1A1A1A;
+    background-color: ${colors.button.hover};
+    color: ${colors.button.textHover};
     transform: translateY(-1px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
@@ -515,7 +530,7 @@ const CurrentDateLine = styled.div`
   top: 20px;
   bottom: 0;
   width: 2px;
-  background-color: #FF4444;
+  background-color: ${colors.currentDateLine};
   z-index: 2000;
   pointer-events: none;
 
@@ -525,8 +540,8 @@ const CurrentDateLine = styled.div`
     top: 0px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #FF4444;
-    color: white;
+    background-color: ${colors.currentDateLine};
+    color: ${colors.white};
     padding: 2px 8px;
     border-radius: 4px;
     font-size: 12px;
@@ -536,10 +551,10 @@ const CurrentDateLine = styled.div`
 
 const Tooltip = styled.div`
   position: fixed;
-  background: white;
+  background: ${colors.white};
   border-radius: 8px;
   padding: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px ${colors.tooltip.shadow};
   z-index: 3000;
   min-width: 280px;
   max-width: 360px;
@@ -553,7 +568,7 @@ const Tooltip = styled.div`
     transform: translateX(-50%);
     border-style: solid;
     border-width: 8px 8px 0 8px;
-    border-color: white transparent transparent transparent;
+    border-color: ${colors.tooltip.arrow} transparent transparent transparent;
   }
 `;
 
@@ -565,13 +580,13 @@ const TooltipTitle = styled.div`
   font-weight: 700;
   margin-bottom: 8px;
   padding-bottom: 8px;
-  border-bottom: 2px solid #eee;
-  color: #333;
+  border-bottom: 2px solid ${colors.border};
+  color: ${colors.text.primary};
 `;
 
 const TooltipContent = styled.div`
   font-size: 14px;
-  color: #444;
+  color: ${colors.text.tertiary};
   display: grid;
   gap: 6px;
   
@@ -583,12 +598,22 @@ const TooltipContent = styled.div`
     &::before {
       content: attr(data-label);
       font-weight: 600;
-      color: #666;
+      color: ${colors.text.secondary};
     }
     
     &[data-label="기간"] {
-      color: #2C5282;
       font-weight: 500;
+      
+      // 동적 색상 적용을 위해 data-days 속성 사용
+      &[data-days="danger"] {
+        color: ${colors.text.remainDays.danger};
+      }
+      &[data-days="warning"] {
+        color: ${colors.text.remainDays.warning};
+      }
+      &[data-days="normal"] {
+        color: ${colors.text.remainDays.normal};
+      }
     }
   }
 `;

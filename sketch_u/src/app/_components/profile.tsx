@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useRouter } from "next/navigation";
 import { RoadmapService } from "@/services/roadmapService";
+import { colors } from "../utils/colorSheet";
 
 const Button = styled.button`
   position: absolute;
   right: 0;
-  background-color: #f2f2f2;
+  background-color: ${colors.profile.button.background};
   border: none;
   border-radius: 50%;
   width: 44px;
@@ -16,10 +17,10 @@ const Button = styled.button`
   justify-content: center;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  filter: drop-shadow(1px 3px 5px rgba(0, 0, 0, 0.2));
+  filter: drop-shadow(1px 3px 5px ${colors.profile.button.shadow});
   z-index: 100;
   &:hover {
-    background-color: #e1e1e1;
+    background-color: ${colors.profile.button.hover};
   }
 `;
 
@@ -27,10 +28,10 @@ const DropdownMenu = styled.div`
   position: absolute;
   top: 50px;
   right: 0px;
-  background-color: #ffffff;
+  background-color: ${colors.profile.dropdown.background};
   border: none;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 20px ${colors.profile.dropdown.shadow};
   padding: 8px;
   display: flex;
   flex-direction: column;
@@ -55,7 +56,7 @@ const DropdownMenu = styled.div`
 
 const DropdownButton = styled.button`
   width: 100%;
-  background-color: transparent;
+  background-color: ${colors.profile.dropdown.item.background};
   border: none;
   border-radius: 8px;
   padding: 10px 16px;
@@ -65,16 +66,16 @@ const DropdownButton = styled.button`
   align-items: center;
   gap: 8px;
   font-size: 15px;
-  color: #333;
+  color: ${colors.profile.dropdown.item.text};
   font-weight: 500;
 
   &:hover {
-    background-color: #f0f0f0;
-    color: #000;
+    background-color: ${colors.profile.dropdown.item.hover};
+    color: ${colors.profile.dropdown.item.textHover};
   }
 
   &:active {
-    background-color: #e5e5e5;
+    background-color: ${colors.profile.dropdown.item.active};
     transform: scale(0.98);
   }
 
@@ -170,7 +171,7 @@ export default function ProfileButton() {
           <DropdownMenu>
             {isLoggedIn ? (
               <>
-                <div style={{ padding: "10px 16px", fontSize: "15px", color: "#333" }}>
+                <div style={{ padding: "10px 16px", fontSize: "15px", color: colors.profile.dropdown.welcomeText }}>
                   {username}님 환영합니다.
                 </div>
                 <DropdownButton onClick={() => router.push('/settings')}>설정</DropdownButton>
