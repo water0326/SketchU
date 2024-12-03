@@ -144,9 +144,10 @@ export default function LoginPage() {
 
       const data = await response.json();
       
-      // 토큰 저장
+      // 토큰과 username 저장
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem('username', username);
 
       // 홈페이지로 리다이렉트
       router.push('/');

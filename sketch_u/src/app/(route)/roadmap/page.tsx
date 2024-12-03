@@ -142,8 +142,7 @@ const CancelButton = styled(SaveButton)`
   }
 `;
 
-const RoadmapTitle = styled.h2`
-  margin-bottom: 1rem;
+const RoadmapTitle = styled.div`
   font-size: 33px;
   font-weight: 600;
 `;
@@ -196,7 +195,11 @@ const StatusIcon = styled.div`
   right: 12px;
 `;
 
-const SessionItem = styled.li<{ status: 'completed' | 'current' | 'upcoming'; selected: boolean }>`
+const SessionItem = styled.li<{ 
+  status: 'completed' | 'current' | 'upcoming'; 
+  selected: boolean;
+  isClear?: boolean;
+}>`
     width: 100%;
     height: 113px;
     padding-left: 12px;
@@ -244,12 +247,23 @@ const Title = styled.div`
     font-size: 23px;
     color: #000000;
     font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 50px);
 `;
 
 const SessionDescription = styled.div`
     font-size: 18px;
     color: #3C3C3C;
     font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    word-break: break-word;
+    padding-right: 15px;
 `;
 
 const Note = styled.div`
@@ -380,6 +394,27 @@ const TooltipContainer = styled.div<{ isVisible: boolean; isError?: boolean }>`
   filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.15));
 `;
 
+const RoadmapTitleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+`;
+
+const TitleWithIcons = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 15px;
+`;
+
+const IconButton = styled.div`
+  cursor: pointer;
+  padding: 5px;
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
 interface UserEntity {
   id: number;
   username: string;
@@ -453,6 +488,9 @@ export default function HomePage() {
   const [editedDeadline, setEditedDeadline] = useState('');
   const [tooltipMessage, setTooltipMessage] = useState('');
   const [showTooltip, setShowTooltip] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedRoadmapName, setEditedRoadmapName] = useState('');
+  const [showDeleteSessionModal, setShowDeleteSessionModal] = useState(false);
 
   const initialRoadmapData: RoadmapData = {
     roadmapId: 1,
@@ -621,7 +659,7 @@ export default function HomePage() {
         };
         adjustmentsMade = true;
         
-        // 이전 세션의 시작일이 그 이전 션의 마감일보다 앞서면 재귀 호출
+        // 이 세션의 시작일이 그 이전 션의 마감일보다 앞서면 재귀 호출
         adjustPreviousSessions(currentIndex - 1, newStartDate.toISOString().split('T')[0]);
       }
     };
@@ -683,9 +721,11 @@ export default function HomePage() {
 
   const handleSessionComplete = async () => {
     if (selectedSession === roadmapData.achieved) {
+      const isLastSession = selectedSession === roadmapData.sessionData.length - 1;
       const newData = {
         ...roadmapData,
-        achieved: roadmapData.achieved + 1
+        achieved: roadmapData.achieved + 1,
+        clear: isLastSession // 마지막 세션 완료시 clear를 true로 설정
       };
       
       setRoadmapData(newData);
@@ -699,9 +739,11 @@ export default function HomePage() {
   };
 
   const handleSessionCancel = async () => {
+    const isLastSession = selectedSession === roadmapData.sessionData.length - 1;
     const newData = {
       ...roadmapData,
-      achieved: roadmapData.achieved - 1
+      achieved: roadmapData.achieved - 1,
+      clear: isLastSession ? false : roadmapData.clear // 마지막 세션 취소시 clear를 false로 설정
     };
     
     setRoadmapData(newData);
@@ -745,31 +787,85 @@ export default function HomePage() {
     setEditedDescription("설명을 입력하세요");
   };
 
-  const handleDeleteClick = () => {
+  const handleDeleteRoadmapClick = () => {
     setShowDeleteModal(true);
   };
 
-  const handleDeleteConfirm = () => {
-    if (selectedSession === null) return;
+  const handleDeleteRoadmapConfirm = async () => {
+    const result = await RoadmapService.deleteRoadmap(roadmapData.roadmapId);
     
-    setRoadmapData(prev => {
-      if (!prev) return null;
-      const currentSessions = Array.isArray(prev.sessionData) ? prev.sessionData : [];
-      const updatedSessions = currentSessions.filter((_, index) => index !== selectedSession);
-      const reorderedSessions = updatedSessions.map((session, index) => ({
+    if (result.success) {
+      router.push('/roadmapList');
+    } else {
+      if (result.error === 'Unauthorized') {
+        router.push('/login');
+        return;
+      }
+      console.error('로드맵 삭제 실패:', result.error);
+      showTooltipMessage('로드맵 삭제에 실패했습니다.', true);
+    }
+    setShowDeleteModal(false);
+  };
+
+  const handleEditTitleClick = () => {
+    setIsEditingTitle(true);
+    setEditedRoadmapName(roadmapData.roadmapName);
+  };
+
+  const handleSaveTitle = async () => {
+    if (!editedRoadmapName.trim()) {
+      showTooltipMessage('로드맵 이름을 입력해주세요.', true);
+      return;
+    }
+
+    const newData = {
+      ...roadmapData,
+      roadmapName: editedRoadmapName
+    };
+
+    try {
+      await saveRoadmap(newData);
+      setRoadmapData(newData);
+      setIsEditingTitle(false);
+      showTooltipMessage('로드맵 이름이 수정되었습니다.');
+    } catch (error) {
+      showTooltipMessage('로드맵 이름 수정에 실패했습니다.', true);
+    }
+  };
+
+  // handleDeleteSession 함수 추가
+  const handleDeleteSession = () => {
+    setShowDeleteSessionModal(true);
+  };
+
+  // 실제 삭제 처리를 위한 새로운 함수
+  const handleDeleteSessionConfirm = async () => {
+    if (selectedSession === null) return;
+
+    const updatedSessions = roadmapData.sessionData
+      .filter((_, index) => index !== selectedSession)
+      .map((session, index) => ({
         ...session,
         seq: index + 1
       }));
-      
-      return {
-        ...prev,
-        sessionData: reorderedSessions,
-        achieved: selectedSession < prev.achieved ? prev.achieved - 1 : prev.achieved
-      };
-    });
-    
-    setShowDeleteModal(false);
+
+    const newAchieved = selectedSession < roadmapData.achieved 
+      ? roadmapData.achieved - 1 
+      : roadmapData.achieved;
+
+    const isClear = updatedSessions.length === newAchieved;
+
+    const newData = {
+      ...roadmapData,
+      sessionData: updatedSessions,
+      achieved: newAchieved,
+      clear: isClear
+    };
+
+    setRoadmapData(newData);
     setSelectedSession(null);
+    setShowDeleteSessionModal(false);
+    await saveRoadmap(newData);
   };
 
   return (
@@ -780,7 +876,45 @@ export default function HomePage() {
       <PageName>내 로드맵</PageName>
       <ContentContainer>
         <Sidebar>
-          <RoadmapTitle>{roadmapData.roadmapName}</RoadmapTitle>
+          <RoadmapTitleContainer>
+            <TitleWithIcons>
+              {isEditingTitle ? (
+                <>
+                  <input
+                    value={editedRoadmapName}
+                    onChange={(e) => setEditedRoadmapName(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSaveTitle()}
+                    style={{
+                      fontSize: '33px',
+                      fontWeight: '600',
+                      border: 'none',
+                      background: '#FFFFFF',
+                      padding: '5px 10px',
+                      borderRadius: '8px',
+                      width: '300px'
+                    }}
+                    autoFocus
+                  />
+                  <IconButton onClick={handleSaveTitle}>
+                    <img src="/icons/save.svg" alt="save roadmap name" />
+                  </IconButton>
+                  <IconButton onClick={() => setIsEditingTitle(false)}>
+                    <img src="/icons/cancel.svg" alt="cancel edit" />
+                  </IconButton>
+                </>
+              ) : (
+                <>
+                  <RoadmapTitle>{roadmapData.roadmapName}</RoadmapTitle>
+                  <IconButton onClick={handleEditTitleClick}>
+                    <img src="/icons/edit.svg" alt="edit roadmap" />
+                  </IconButton>
+                  <IconButton onClick={handleDeleteRoadmapClick}>
+                    <img src="/icons/delete.svg" alt="delete roadmap" />
+                  </IconButton>
+                </>
+              )}
+            </TitleWithIcons>
+          </RoadmapTitleContainer>
           <Divider />
           <SessionList>
             {roadmapData.sessionData.map((session, index) => (
@@ -794,6 +928,7 @@ export default function HomePage() {
                     : 'upcoming'
                 }
                 selected={selectedSession === index}
+                isClear={roadmapData.clear}
                 onClick={() => {
                   setSelectedSession(index);
                   setIsEditing(false);
@@ -850,7 +985,7 @@ export default function HomePage() {
                       </span>
                     </>
                   )}
-                  <span onClick={handleDeleteClick}><img src="/icons/delete.svg" alt="delete" /></span>
+                  <span onClick={handleDeleteSession}><img src="/icons/delete.svg" alt="delete" /></span>
                 </HeaderIcons>
                 <HeaderTitle>
                   {isEditing ? (
@@ -962,13 +1097,29 @@ export default function HomePage() {
       {showDeleteModal && (
         <Modal>
           <ModalContent>
-            <ModalTitle>세션을 삭제하시겠습니까?</ModalTitle>
+            <ModalTitle>로드맵을 삭제하시겠습니까?</ModalTitle>
             <ModalDescription>이 작업은 되돌릴 수 없습니다.</ModalDescription>
             <ModalButtons>
               <ModalButton className="cancel" onClick={() => setShowDeleteModal(false)}>
                 취소
               </ModalButton>
-              <ModalButton className="confirm" onClick={handleDeleteConfirm}>
+              <ModalButton className="confirm" onClick={handleDeleteRoadmapConfirm}>
+                삭제
+              </ModalButton>
+            </ModalButtons>
+          </ModalContent>
+        </Modal>
+      )}
+      {showDeleteSessionModal && (
+        <Modal>
+          <ModalContent>
+            <ModalTitle>세션을 삭제하시겠습니까?</ModalTitle>
+            <ModalDescription>이 작업은 되돌릴 수 없습니다.</ModalDescription>
+            <ModalButtons>
+              <ModalButton className="cancel" onClick={() => setShowDeleteSessionModal(false)}>
+                취소
+              </ModalButton>
+              <ModalButton className="confirm" onClick={handleDeleteSessionConfirm}>
                 삭제
               </ModalButton>
             </ModalButtons>

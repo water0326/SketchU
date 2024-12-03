@@ -21,40 +21,92 @@ interface TimelineItem {
 
 const Roadmap: React.FC = () => {
   const [roadmapData, setRoadmapData] = useState<RoadmapListResponse[]>([]);
+  const [sortOption, setSortOption] = useState<string>("deadline");
+  const [showOnlyInProgress, setShowOnlyInProgress] = useState(false);
   const router = useRouter();
   const searchParams = new URLSearchParams(window.location.search);
   const roadmapId = searchParams.get('roadmapId');
+  const [isLoading, setIsLoading] = useState(true);
+
+  const sortRoadmaps = (data: RoadmapListResponse[], option: string) => {
+    return [...data].sort((a, b) => {
+      if (option === "deadline") {
+        const daysLeftA = a.sessionData?.[a.achieved]
+          ? Math.ceil(
+              (new Date(a.sessionData[a.achieved].deadline).getTime() -
+                new Date().getTime()) /
+                (1000 * 60 * 60 * 24)
+            )
+          : 0;
+        const daysLeftB = b.sessionData?.[b.achieved]
+          ? Math.ceil(
+              (new Date(b.sessionData[b.achieved].deadline).getTime() -
+                new Date().getTime()) /
+                (1000 * 60 * 60 * 24)
+            )
+          : 0;
+        return daysLeftA - daysLeftB;
+      } else {
+        return a.roadmapName.localeCompare(b.roadmapName);
+      }
+    });
+  };
 
   useEffect(() => {
     const fetchRoadmaps = async () => {
-      const result = await RoadmapService.getAllRoadmaps();
-      
-      if (result.success && result.data) {
-        if (roadmapId) {
-          const selectedRoadmap = result.data.find(
-            (roadmap) => roadmap.roadmapId === Number(roadmapId)
-          );
-          if (selectedRoadmap) {
-            setRoadmapData([selectedRoadmap]);
+      setIsLoading(true);
+      try {
+        const result = await RoadmapService.getAllRoadmaps();
+        
+        if (result.success && result.data) {
+          let sortedData = sortRoadmaps(result.data, sortOption);
+          
+          if (showOnlyInProgress) {
+            sortedData = sortedData.filter(roadmap => !roadmap.clear);
+          }
+
+          if (roadmapId) {
+            const selectedRoadmap = sortedData.find(
+              (roadmap) => roadmap.roadmapId === Number(roadmapId)
+            );
+            if (selectedRoadmap) {
+              setRoadmapData([selectedRoadmap]);
+            }
+          } else {
+            setRoadmapData(sortedData);
           }
         } else {
-          setRoadmapData(result.data);
+          if (result.error === 'Unauthorized') {
+            router.push('/login');
+            return;
+          }
+          console.error('로드맵 데이터 가져오기 실패:', result.error);
         }
-      } else {
-        if (result.error === 'Unauthorized') {
-          router.push('/login');
-          return;
-        }
-        console.error('Failed to fetch roadmaps:', result.error);
+      } catch (error) {
+        console.error('API 호출 에러:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchRoadmaps();
-  }, [roadmapId, router]);
+  }, [roadmapId, router, sortOption, showOnlyInProgress]);
 
   useEffect(() => {
     console.log(roadmapData);
   }, [roadmapData]);
+
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortOption(e.target.value);
+  };
+
+  const handleRedirect = async () => {
+    try {
+      await router.push('/roadmapList');
+    } catch (error) {
+      console.error('라우팅 에러:', error);
+    }
+  };
 
   return (
     <Container>
@@ -64,14 +116,18 @@ const Roadmap: React.FC = () => {
       <Controls>
         <SortContainer>
           정렬 :
-          <SortSelect>
-            <SortOption value="A">A</SortOption>
-            <SortOption value="B">B</SortOption>
+          <SortSelect value={sortOption} onChange={handleSortChange}>
+            <SortOption value="deadline">남은 기간 순</SortOption>
+            <SortOption value="abc">가나다 순</SortOption>
           </SortSelect>
         </SortContainer>
         <Checkbox>
           진행중만 표시
-          <input type="checkbox" />
+          <input 
+            type="checkbox" 
+            checked={showOnlyInProgress}
+            onChange={(e) => setShowOnlyInProgress(e.target.checked)}
+          />
           <StyledCheckBox>
             <img src="icons/Check.svg" alt="check" />
           </StyledCheckBox>
@@ -79,28 +135,30 @@ const Roadmap: React.FC = () => {
       </Controls>
       <CardContainer> 
         {roadmapData.map((roadmap) => (
-          <RoadmapCard
-            key={roadmap.roadmapId}
-            roadmapId={roadmap.roadmapId}
-            currentSession={
-              roadmap.sessionData?.[roadmap.achieved]?.topic || '진행중인 세션 없음'
-            }
-            nextSession={
-              roadmap.sessionData?.[roadmap.achieved + 1]?.topic || '다음 세션 없음'
-            }
-            category={roadmap.roadmapName}
-            daysLeft={
-              roadmap.sessionData?.[0]
-                ? Math.ceil(
-                    (new Date(roadmap.sessionData[0].deadline).getTime() -
-                      new Date(roadmap.sessionData[0].start_date).getTime()) /
-                        (1000 * 60 * 60 * 24)
-                  )
-                : 0
-            }
-            progress={roadmap.achieved}
-            maxProgress={roadmap.sessionData?.length || 0}
-          />
+          <div key={roadmap.roadmapId}>
+            <RoadmapCard
+              roadmapId={roadmap.roadmapId}
+              clear={roadmap.clear}
+              currentSession={
+                roadmap.sessionData?.[roadmap.achieved]?.topic || '진행중인 세션 없음'
+              }
+              nextSession={
+                roadmap.sessionData?.[roadmap.achieved + 1]?.topic || '다음 세션 없음'
+              }
+              category={roadmap.roadmapName}
+              daysLeft={
+                roadmap.sessionData?.[roadmap.achieved]
+                  ? Math.ceil(
+                      (new Date(roadmap.sessionData[roadmap.achieved].deadline).getTime() -
+                        new Date().getTime()) /
+                          (1000 * 60 * 60 * 24)
+                    )
+                  : 0
+              }
+              progress={roadmap.achieved}
+              maxProgress={roadmap.sessionData?.length || 0}
+            />
+          </div>
         ))}
       </CardContainer>
     </Container>
@@ -126,7 +184,7 @@ const Controls = styled.div`
 `;
 
 const SortContainer = styled.div`
-  width: 152px;
+  width: 200px;
   height: 45px;
   border-radius: 13px;
   background-color: #F4F4F4;
@@ -141,7 +199,7 @@ const SortContainer = styled.div`
 const SortSelect = styled.select`
   padding: 4px 8px;
   font-size: 14px;
-  width: 80px;
+  width: 120px;
   height: 36px;
   border-radius: 13px;
   margin-left: 15px;
@@ -210,6 +268,7 @@ const CardContainer = styled.div`
   max-height: calc(100vh - 220px);
   overflow-y: auto;
   padding-right: 8px;
+  position: relative;
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -229,3 +288,4 @@ const CardContainer = styled.div`
     background: #555;
   }
 `;
+

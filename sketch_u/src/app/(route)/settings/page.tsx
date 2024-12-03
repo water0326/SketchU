@@ -18,6 +18,27 @@ const PageName = styled.div`
 const SettingsContainer = styled.div`
   max-width: 800px;
   margin: 0 auto;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  padding-right: 20px;
+  
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #90D8BF;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #7EC5AD;
+  }
 `;
 
 const Section = styled.div`
@@ -130,9 +151,7 @@ const DeleteButton = styled(Button)`
 `;
 
 export default function SettingsPage() {
-  const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
-  const [emailUpdates, setEmailUpdates] = useState(true);
 
   return (
     <Container>
@@ -141,39 +160,6 @@ export default function SettingsPage() {
       <PageName>설정</PageName>
       
       <SettingsContainer>
-        <Section>
-          <SectionTitle>알림 설정</SectionTitle>
-          <SettingItem>
-            <SettingInfo>
-              <SettingTitle>푸시 알림</SettingTitle>
-              <SettingDescription>로드맵 마감일 알림을 받습니다</SettingDescription>
-            </SettingInfo>
-            <Toggle>
-              <ToggleInput 
-                type="checkbox" 
-                checked={notifications}
-                onChange={(e) => setNotifications(e.target.checked)}
-              />
-              <ToggleSlider />
-            </Toggle>
-          </SettingItem>
-          
-          <SettingItem>
-            <SettingInfo>
-              <SettingTitle>이메일 알림</SettingTitle>
-              <SettingDescription>주간 진행상황 리포트를 이메일로 받습니다</SettingDescription>
-            </SettingInfo>
-            <Toggle>
-              <ToggleInput 
-                type="checkbox" 
-                checked={emailUpdates}
-                onChange={(e) => setEmailUpdates(e.target.checked)}
-              />
-              <ToggleSlider />
-            </Toggle>
-          </SettingItem>
-        </Section>
-
         <Section>
           <SectionTitle>화면 설정</SectionTitle>
           <SettingItem>
@@ -189,17 +175,6 @@ export default function SettingsPage() {
               />
               <ToggleSlider />
             </Toggle>
-          </SettingItem>
-        </Section>
-
-        <Section>
-          <SectionTitle>계정 관리</SectionTitle>
-          <SettingItem>
-            <SettingInfo>
-              <SettingTitle>계정 삭제</SettingTitle>
-              <SettingDescription>모든 데이터가 영구적으로 삭제됩니다</SettingDescription>
-            </SettingInfo>
-            <DeleteButton>계정 삭제</DeleteButton>
           </SettingItem>
         </Section>
       </SettingsContainer>

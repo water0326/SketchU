@@ -13,6 +13,7 @@ type RoadmapCardProps = {
   progress: number;
   maxProgress: number;
   roadmapId: number;
+  clear: boolean;
 };
 
 const RoadmapCard: React.FC<RoadmapCardProps> = ({
@@ -23,6 +24,7 @@ const RoadmapCard: React.FC<RoadmapCardProps> = ({
   progress,
   maxProgress,
   roadmapId,
+  clear,
 }) => {
   const router = useRouter();
 
@@ -31,30 +33,32 @@ const RoadmapCard: React.FC<RoadmapCardProps> = ({
   };
 
   return (
-    <Card onClick={handleClick}>
+    <Card $clear={clear} onClick={handleClick}>
       <ProgressBar>
         {Array.from({ length: maxProgress }, (_, index) => (
           <ProgressIndicator key={index} active={index < progress} />
         ))}
       </ProgressBar>
       <TitleContainer>
-        <Title>{title}</Title>
-        <Subtitle>{subtitle}</Subtitle>
+        <Title>{clear ? "완료한 세션" : title}</Title>
+        {!clear && <Subtitle>{subtitle}</Subtitle>}
       </TitleContainer>
       <InfoContainer>
         <Category>{category}</Category>
-        <DaysLeft>{daysLeft}일 남음</DaysLeft>
+        {!clear && <DaysLeft>{daysLeft}일 남음</DaysLeft>}
       </InfoContainer>
+      {clear && <CompleteIcon src="icons/complete.svg" alt="완료" />}
     </Card>
   );
 };
 
 export default RoadmapCard;
 
-const Card = styled.div`
+const Card = styled.div<{ $clear: boolean }>`
   width: 334px;
+  height: 233px;
   margin: 19px;
-  background: #F6F9F3;
+  background: ${props => props.$clear ? '#E5E5E5' : '#F6F9F3'};
   border-radius: 13px;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -63,11 +67,13 @@ const Card = styled.div`
   flex-direction: column;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
+  opacity: ${props => props.$clear ? 0.8 : 1};
+  position: relative;
   
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
-    background: #F0F5EC;
+    background: ${props => props.$clear ? '#DADADA' : '#F0F5EC'};
   }
 `;
 
@@ -110,12 +116,21 @@ const Title = styled.h3`
   font-weight: 500;
   color: #2B2B2B;
   margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
 `;
 
 const Subtitle = styled.p`
   color: #1C1C1C;
   font-size: 14px;
   font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+  margin: 0;
 `;
 
 const InfoContainer = styled.div`
@@ -144,4 +159,11 @@ const DaysLeft = styled.span`
   font-weight: 600;
   font-size: 12px;
   color: #2792DF;
+`;
+
+const CompleteIcon = styled.img`
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 72px;
 `;

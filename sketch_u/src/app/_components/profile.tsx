@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useRouter } from "next/navigation";
 import { RoadmapService } from "@/services/roadmapService";
@@ -37,6 +37,7 @@ const DropdownMenu = styled.div`
   gap: 6px;
   z-index: 100;
   min-width: 140px;
+  width: max-content;
   transform-origin: top right;
   animation: dropdownFade 0.2s ease-out;
 
@@ -84,20 +85,21 @@ const DropdownButton = styled.button`
     background-size: contain;
     background-repeat: no-repeat;
   }
-
-  &:first-child:before {
-    background-image: url('/icons/login.svg');
-  }
-
-  &:last-child:before {
-    background-image: url('/icons/logout.svg');
-  }
 `;
 
 export default function ProfileButton() {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
   const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    const storedUsername = localStorage.getItem('username');
+    setIsLoggedIn(!!token);
+    setUsername(storedUsername);
+  }, []);
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) {
@@ -141,11 +143,11 @@ export default function ProfileButton() {
         throw new Error('Logout failed');
       }
 
-      // 로컬 스토리지에서 토큰 제거
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
-
-      // 로그인 페이지로 리다이렉트
+      localStorage.removeItem('username');
+      setIsLoggedIn(false);
+      setUsername(null);
       router.push('/login');
       setShowDropdown(false);
     } catch (error) {
@@ -156,21 +158,33 @@ export default function ProfileButton() {
 
   return (
     <div style={{ position: "absolute", top: "13px", right: "25px", width: "100px", height: "100px"}}>
-        <div 
-            style={{ position: "relative", width: "100%", height: "100%" }}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-        >
+      <div 
+        style={{ position: "relative", width: "100%", height: "100%" }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <Button>
-            <img src="/icons/Profile.svg" alt="Profile Icon" />
+          <img src="/icons/Profile.svg" alt="Profile Icon" />
         </Button>
         {showDropdown && (
-            <DropdownMenu>
-            <DropdownButton onClick={handleLogin}>Login</DropdownButton>
-            <DropdownButton onClick={handleLogout}>Logout</DropdownButton>
-            </DropdownMenu>
+          <DropdownMenu>
+            {isLoggedIn ? (
+              <>
+                <div style={{ padding: "10px 16px", fontSize: "15px", color: "#333" }}>
+                  {username}님 환영합니다.
+                </div>
+                <DropdownButton onClick={() => router.push('/settings')}>설정</DropdownButton>
+                <DropdownButton onClick={handleLogout}>로그아웃</DropdownButton>
+              </>
+            ) : (
+              <>
+                <DropdownButton onClick={handleLogin}>로그인</DropdownButton>
+                <DropdownButton onClick={() => router.push('/signup')}>회원가입</DropdownButton>
+              </>
+            )}
+          </DropdownMenu>
         )}
-        </div>
+      </div>
     </div>
   );
 }

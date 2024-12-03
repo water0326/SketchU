@@ -110,7 +110,7 @@ export class RoadmapService {
           'Authorization': `Bearer ${accessToken}`
         }
       });
-
+      console.log(response);
       if (!response.ok) {
         if (response.status === 401) {
           throw new Error('Unauthorized');
@@ -131,6 +131,43 @@ export class RoadmapService {
       };
     } catch (error) {
       console.error('Failed to fetch roadmap:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
+      };
+    }
+  }
+
+  static async deleteRoadmap(roadmapId: number) {
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        throw new Error('No access token found');
+      }
+
+      const response = await this.apiFetch(`/roadmap/delete/${roadmapId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Unauthorized');
+        }
+        if (response.status === 403) {
+          throw new Error('Unauthorized access to roadmap');
+        }
+        throw new Error(`Failed to delete roadmap: ${response.statusText}`);
+      }
+
+      return {
+        success: true,
+        message: 'Roadmap deleted successfully'
+      };
+    } catch (error) {
+      console.error('로드맵 삭제 실패:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error occurred'
