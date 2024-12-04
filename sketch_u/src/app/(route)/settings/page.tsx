@@ -46,21 +46,51 @@ const Section = styled.div`
 `;
 
 const SectionTitle = styled.h2`
-  font-size: 24px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 20px;
+  font-size: 32px;
+  font-weight: 800;
+  color: #2C3E50;
+  margin-bottom: 32px;
+  position: relative;
+  display: inline-block;
+
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #90D8BF, transparent);
+    border-radius: 2px;
+  }
+`;
+
+const CreatorsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const SettingItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  background: #F6F9F3;
-  border-radius: 13px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 28px;
+  background: linear-gradient(145deg, #F6F9F3, #FFFFFF);
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(144, 216, 191, 0.2);
+  height: 100%;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  }
 `;
 
 const SettingInfo = styled.div`
@@ -68,15 +98,38 @@ const SettingInfo = styled.div`
 `;
 
 const SettingTitle = styled.h3`
-  font-size: 18px;
-  font-weight: 600;
-  color: #3C3C3C;
-  margin-bottom: 6px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #2C3E50;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &:after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 3px;
+    background: linear-gradient(90deg, #90D8BF, #7EC5AD);
+    border-radius: 2px;
+    margin-left: 8px;
+  }
 `;
 
 const SettingDescription = styled.p`
-  font-size: 14px;
+  font-size: 15px;
   color: #666;
+  line-height: 1.6;
+  margin-bottom: 16px;
+
+  &:last-child {
+    margin-bottom: 0;
+    padding: 16px;
+    background: rgba(144, 216, 191, 0.1);
+    border-radius: 8px;
+    font-family: 'Roboto Mono', monospace;
+  }
 `;
 
 const Toggle = styled.label`
@@ -150,9 +203,114 @@ const DeleteButton = styled(Button)`
   }
 `;
 
-export default function SettingsPage() {
-  const [darkMode, setDarkMode] = useState(false);
+const Role = styled.span`
+  display: inline-block;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #90D8BF, #7EC5AD);
+  color: white;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(144, 216, 191, 0.3);
+`;
 
+const LinkButton = styled(Button)`
+  padding: 8px 16px;
+  font-size: 14px;
+  margin-right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  
+  &:last-child {
+    margin-right: 0;
+  }
+`;
+
+const ButtonContainer = styled.div`
+  margin-top: 16px;
+`;
+
+// 개발자 정보 타입 정의 수정
+interface Developer {
+  name: string;
+  role: string;
+  responsibilities: string[];
+  contact: {
+    github: string;
+    email: string;
+    portfolio?: string; // optional portfolio URL
+  };
+}
+
+// 개발자 정보 데이터 수정
+const developers: Developer[] = [
+  {
+    name: "김동훈",
+    role: "Server / AI Developer",
+    responsibilities: [
+      "Backend Architecture 설계 및 구현",
+      "AI 모델 개발 및 최적화",
+      "서버 인프라 구축 및 관리",
+      "API 설계 및 구현"
+    ],
+    contact: {
+      github: "kjbddo",
+      email: "kjbddo@gmail.com"
+    }
+  },
+  {
+    name: "이정",
+    role: "UI / UX Developer",
+    responsibilities: [
+      "Frontend Architecture 설계 및 구현",
+      "UI/UX 디자인 및 개발",
+      "사용자 경험 최적화"
+    ],
+    contact: {
+      github: "water0326",
+      email: "besteunju4@gmail.com",
+      portfolio: "https://zircon-sink-85a.notion.site/10d2f179af5e8091b1a0d339258736d3?v=fff2f179af5e813d87ef000ce3df927b"  // 포트폴리오 URL 추가
+    }
+  }
+];
+
+// 개발자 카드 컴포넌트 수정
+const DeveloperCard = ({ developer }: { developer: Developer }) => (
+  <SettingItem>
+    <SettingInfo>
+      <SettingTitle>{developer.name}</SettingTitle>
+      <Role>{developer.role}</Role>
+      <SettingDescription>
+        {developer.responsibilities.map((resp, index) => (
+          <React.Fragment key={index}>
+            • {resp}<br />
+          </React.Fragment>
+        ))}
+      </SettingDescription>
+      <SettingDescription>
+        • Email: {developer.contact.email}
+      </SettingDescription>
+      <ButtonContainer>
+        <LinkButton 
+          onClick={() => window.open(`https://github.com/${developer.contact.github}`, '_blank')}
+        >
+          GitHub
+        </LinkButton>
+        {developer.contact.portfolio && (
+          <LinkButton 
+            onClick={() => window.open(developer.contact.portfolio, '_blank')}
+          >
+            Portfolio
+          </LinkButton>
+        )}
+      </ButtonContainer>
+    </SettingInfo>
+  </SettingItem>
+);
+
+export default function SettingsPage() {
   return (
     <Container>
       <ProfileButton />
@@ -161,21 +319,12 @@ export default function SettingsPage() {
       
       <SettingsContainer>
         <Section>
-          <SectionTitle>화면 설정</SectionTitle>
-          <SettingItem>
-            <SettingInfo>
-              <SettingTitle>다크 모드</SettingTitle>
-              <SettingDescription>어두운 테마로 전환합니다</SettingDescription>
-            </SettingInfo>
-            <Toggle>
-              <ToggleInput 
-                type="checkbox" 
-                checked={darkMode}
-                onChange={(e) => setDarkMode(e.target.checked)}
-              />
-              <ToggleSlider />
-            </Toggle>
-          </SettingItem>
+          <SectionTitle>제작자</SectionTitle>
+          <CreatorsGrid>
+            {developers.map((developer, index) => (
+              <DeveloperCard key={index} developer={developer} />
+            ))}
+          </CreatorsGrid>
         </Section>
       </SettingsContainer>
     </Container>

@@ -139,6 +139,11 @@ const Input = styled.input`
   box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.15);
   padding-left: 20px;
   padding-top: 2px;
+
+  &:disabled {
+    background-color: #e9e9e9;
+    cursor: not-allowed;
+  }
 `;
 
 const Button = styled.button<{ $movedUp: boolean }>`
@@ -735,6 +740,7 @@ const StudyForm: React.FC = () => {
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder=""
+          disabled={movedUp}
         />
         <Button $movedUp={movedUp} onClick={handleButtonClick}>
           <img src="/icons/SendButton.svg" alt="Send" />
