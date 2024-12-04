@@ -460,10 +460,6 @@ const updateRoadmap = async (updatedData: RoadmapData) => {
 // Add the saveRoadmap function
 const saveRoadmap = async (updatedData: RoadmapData) => {
   try {
-    console.log({
-      ...updatedData,
-      sessionData: JSON.stringify(updatedData.sessionData)
-    });
     const response = await RoadmapService.apiFetch('/roadmap/updateroadmap', {
       method: 'PUT',
       headers: {

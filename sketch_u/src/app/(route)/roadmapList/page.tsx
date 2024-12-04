@@ -88,7 +88,6 @@ const Roadmap: React.FC = () => {
   }, [roadmapId, router, sortOption, showOnlyInProgress]);
 
   useEffect(() => {
-    console.log(roadmapData);
   }, [roadmapData]);
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
