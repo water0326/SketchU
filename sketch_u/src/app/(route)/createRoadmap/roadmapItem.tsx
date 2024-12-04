@@ -262,12 +262,12 @@ const RoadMapItem: React.FC<RoadMapItemProps> = ({
         {isEditing && (
           <>
             <ItemImage
-              src="./icons/Save.svg"
+              src="./icons/save.svg"
               alt="Confirm icon"
               onClick={() => onConfirm(number, name, description)}
             />
             <ItemImage
-              src="./icons/Cancel.svg"
+              src="./icons/cancel.svg"
               alt="Cancel icon"
               onClick={() => handleCancel(number)}
             />

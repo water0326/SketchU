@@ -164,7 +164,7 @@ export default function ProfileButton() {
         onMouseLeave={handleMouseLeave}
       >
         <Button>
-          <img src="/icons/Profile.svg" alt="Profile Icon" />
+          <img src="/icons/profile.svg" alt="Profile Icon" />
         </Button>
         {showDropdown && (
           <DropdownMenu>

@@ -743,7 +743,7 @@ const StudyForm: React.FC = () => {
           disabled={movedUp}
         />
         <Button $movedUp={movedUp} onClick={handleButtonClick}>
-          <img src="/icons/SendButton.svg" alt="Send" />
+          <img src="/icons/sendbutton.svg" alt="Send" />
         </Button>
         {movedUp && (
           <NewButtonsContainer>

@@ -504,8 +504,8 @@ const ZoomButton = styled.button`
     background-position: center;
     background-image: ${props => 
       props.children?.toString().includes('확대') 
-        ? 'url("/icons/zoom-in.svg")'
-        : 'url("/icons/zoom-out.svg")'
+        ? 'url("/icons/zoomin.svg")'
+        : 'url("/icons/zoomout.svg")'
     };
   }
 `;

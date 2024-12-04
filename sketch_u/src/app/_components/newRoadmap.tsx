@@ -69,7 +69,7 @@ export default function NewRoadmap() {
     <div style={{ position: "absolute", top: "13px", right: "25px", width: "100px", height: "100px"}}>
       <div style={{ position: "relative", width: "100%", height: "100%" }}>
         <Button onClick={() => router.push("/createRoadmap")}>
-          <img src="/icons/Add.svg" alt="Add Roadmap" />
+          <img src="/icons/add.svg" alt="Add Roadmap" />
         </Button>
         <Tooltip>새 로드맵 만들기</Tooltip>
       </div>

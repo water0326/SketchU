@@ -53,9 +53,9 @@ export default function Navigation() {
   const [selectedMenuIndex, setSelectedMenuIndex] = useState(0);
 
   const menuItems = [
-    { iconSrc: "/icons/Puzzle.svg", text: "로드맵", url: "/roadmapList" },
-    { iconSrc: "/icons/Calendar.svg", text: "캘린더", url: "/calendar" },
-    { iconSrc: "/icons/Setting.svg", text: "설정", url: "/settings" }
+    { iconSrc: "/icons/puzzle.svg", text: "로드맵", url: "/roadmapList" },
+    { iconSrc: "/icons/calendar.svg", text: "캘린더", url: "/calendar" },
+    { iconSrc: "/icons/setting.svg", text: "설정", url: "/settings" }
   ];
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export default function Navigation() {
   return (
     <Container>
       <Logo onClick={handleLogoClick}>
-        <img src="/icons/Logo.png" alt="LOGO" />
+        <img src="/icons/logo.png" alt="LOGO" />
       </Logo>
       <Menu>
         {menuItems.map((item, index) => (

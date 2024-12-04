@@ -47,7 +47,7 @@ const RoadmapCard: React.FC<RoadmapCardProps> = ({
         <Category>{category}</Category>
         {!clear && <DaysLeft>{daysLeft}일 남음</DaysLeft>}
       </InfoContainer>
-      {clear && <CompleteIcon src="icons/complete.svg" alt="완료" />}
+      {clear && <CompleteIcon src="/icons/complete.svg" alt="완료" />}
     </Card>
   );
 };
