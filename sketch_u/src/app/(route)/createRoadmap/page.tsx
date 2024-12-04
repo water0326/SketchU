@@ -450,6 +450,24 @@ const ModalButton = styled.button`
   }
 `;
 
+// 알람 팝업창을 위한 스타일드 컴포넌트 추가
+const AlertPopup = styled.div<{ $isVisible: boolean }>`
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #76c7c0;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transform: translateX(${({ $isVisible }) => ($isVisible ? '0' : '200%')});
+  transition: transform 0.3s ease-in-out;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
 const StudyForm: React.FC = () => {
   const [movedUp, setMovedUp] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -484,6 +502,8 @@ const StudyForm: React.FC = () => {
   }>({ items: [] });
   const [isLoading, setIsLoading] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   const handleButtonClick = async () => {
     if (inputValue.trim() === '') return;
@@ -659,6 +679,8 @@ const StudyForm: React.FC = () => {
   };
 
   const handleSaveRoadmap = async () => {
+    setIsButtonDisabled(true); // 버튼 비활성화
+
     const requestBody = {
       roadmapName: roadmapName,
       sessionData: roadmapItems.map(item => ({
@@ -674,13 +696,18 @@ const StudyForm: React.FC = () => {
     const result = await RoadmapService.saveRoadmap(requestBody);
     
     if (result.success) {
-      alert('로드맵이 저장되었습니다!');
+      setShowAlert(true);
+      setTimeout(() => {
+        setShowAlert(false);
+        router.push('/roadmapList'); // 팝업창 후 라우터 이동
+      }, 3000); // 3초 후 알람 숨김 및 라우터 이동
     } else {
       if (result.error === 'Unauthorized') {
         router.push('/login');
         return;
       }
       alert('로드맵 저장에 실패했습니다.');
+      setIsButtonDisabled(false); // 실패 시 버튼 다시 활성화
     }
   };
 
@@ -819,8 +846,8 @@ const StudyForm: React.FC = () => {
         </Button>
         {movedUp && (
           <NewButtonsContainer>
-            <NewButton isResetButton onClick={handleReset}>다시 입력</NewButton>
-            <NewButton onClick={handleSaveRoadmap}>좋아요</NewButton>
+            <NewButton isResetButton onClick={handleReset} disabled={isButtonDisabled}>다시 입력</NewButton>
+            <NewButton onClick={handleSaveRoadmap} disabled={isButtonDisabled}>좋아요</NewButton>
           </NewButtonsContainer>
         )}
       </InputWrapper>
@@ -831,6 +858,7 @@ const StudyForm: React.FC = () => {
             <ModalTitle>로드맵 생성 실패</ModalTitle>
             <ModalDescription>
               로드맵 생성에 실패했습니다.<br />
+              주제를 제대로 입력했는지 확인해주세요.<br />
               기본 로드맵을 표시합니다.
             </ModalDescription>
             <ModalButtons>
@@ -841,6 +869,10 @@ const StudyForm: React.FC = () => {
           </ModalContent>
         </Modal>
       )}
+      <AlertPopup $isVisible={showAlert}>
+        <img src="/icons/check.svg" alt="Success" width="20" height="20" />
+        로드맵이 저장되었습니다!
+      </AlertPopup>
     </StudyContainer>
   );
 };

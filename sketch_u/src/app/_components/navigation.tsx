@@ -59,16 +59,14 @@ export default function Navigation() {
   ];
 
   useEffect(() => {
-    const roadmapRoutes = ['/roadmapList', '/roadmap', '/createRoadmap'];
+    const roadmapRoutes = ['/roadmapList'];
     const isRoadmapRoute = roadmapRoutes.some(route => pathname.startsWith(route));
     
     if (isRoadmapRoute) {
       setSelectedMenuIndex(0);
     } else {
       const currentIndex = menuItems.findIndex(item => pathname.startsWith(item.url));
-      if (currentIndex !== -1) {
-        setSelectedMenuIndex(currentIndex);
-      }
+      setSelectedMenuIndex(currentIndex);
     }
   }, [pathname]);
 

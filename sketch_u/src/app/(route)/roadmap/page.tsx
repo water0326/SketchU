@@ -752,7 +752,7 @@ export default function HomePage() {
     await saveRoadmap(newData);
   };
 
-  const handleAddSession = () => {
+  const handleAddSession = async () => {
     if (selectedSession === null) return;
     
     const currentSessions = Array.isArray(roadmapData.sessionData) ? roadmapData.sessionData : [];
@@ -787,29 +787,41 @@ export default function HomePage() {
       note: null
     };
     
-    setRoadmapData(prev => {
-      if (!prev) return null;
-      const updatedSessions = [
-        ...currentSessions.slice(0, selectedSession + 1),
-        newSession,
-        ...currentSessions.slice(selectedSession + 1).map(session => ({
-          ...session,
-          seq: session.seq + 1
-        }))
-      ];
-      
-      return {
-        ...prev,
-        sessionData: updatedSessions
-      };
-    });
+    // achieved 값 조정 로직
+    const newAchieved = currentSessions[selectedSession].seq < roadmapData.achieved 
+      ? roadmapData.achieved + 1 
+      : roadmapData.achieved;
+    
+    const updatedSessions = [
+      ...currentSessions.slice(0, selectedSession + 1),
+      newSession,
+      ...currentSessions.slice(selectedSession + 1).map(session => ({
+        ...session,
+        seq: session.seq + 1
+      }))
+    ];
 
+    // 새로운 세션이 마지막 세션인지 확인
+    const isAddingLastSession = selectedSession === currentSessions.length - 1;
+
+    const newData = {
+      ...roadmapData,
+      sessionData: updatedSessions,
+      achieved: newAchieved,
+      clear: isAddingLastSession ? false : roadmapData.clear // 마지막 세션 추가 시 clear를 false로 설정
+    };
+
+    // 상태 업데이트 및 API 호출
+    setRoadmapData(newData);
     setSelectedSession(selectedSession + 1);
     setIsEditing(true);
     setEditedTopic("새로운 세션");
     setEditedDescription("설명을 입력하세요");
     setEditedStartDate(newStartDate);
     setEditedDeadline(newDeadline);
+
+    // API 호출
+    await saveRoadmap(newData);
   };
 
   const handleDeleteRoadmapClick = () => {
