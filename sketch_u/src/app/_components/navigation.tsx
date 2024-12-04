@@ -53,9 +53,9 @@ export default function Navigation() {
   const [selectedMenuIndex, setSelectedMenuIndex] = useState(0);
 
   const menuItems = [
-    { iconSrc: process.env.PUBLIC_URL + "puzzle.svg", text: "로드맵", url: "/roadmapList" },
-    { iconSrc: process.env.PUBLIC_URL + "calendar.svg", text: "캘린더", url: "/calendar" },
-    { iconSrc: process.env.PUBLIC_URL + "setting.svg", text: "설정", url: "/settings" }
+    { iconSrc: process.env.PUBLIC_URL + "icons/puzzle.svg", text: "로드맵", url: "/roadmapList" },
+    { iconSrc: process.env.PUBLIC_URL + "icons/calendar.svg", text: "캘린더", url: "/calendar" },
+    { iconSrc: process.env.PUBLIC_URL + "icons/setting.svg", text: "설정", url: "/settings" }
   ];
 
   useEffect(() => {
