@@ -415,6 +415,12 @@ const IconButton = styled.div`
   }
 `;
 
+// 새로운 스타일 컴포넌트 추가
+const DisabledIcon = styled.span`
+  opacity: 0.5;
+  cursor: not-allowed;
+`;
+
 interface UserEntity {
   id: number;
   username: string;
@@ -753,19 +759,40 @@ export default function HomePage() {
   const handleAddSession = () => {
     if (selectedSession === null) return;
     
+    const currentSessions = Array.isArray(roadmapData.sessionData) ? roadmapData.sessionData : [];
+    
+    // 새로운 세션의 시작일과 마감일 계산
+    let newStartDate, newDeadline;
+    
+    if (selectedSession === currentSessions.length - 1) {
+      // 마지막 세션 다음에 추가하는 경우
+      newStartDate = currentSessions[selectedSession].deadline;
+      newDeadline = new Date(newStartDate);
+      newDeadline.setDate(newDeadline.getDate() + 1);
+      newDeadline = newDeadline.toISOString().split('T')[0];
+    } else if (selectedSession === 0) {
+      // 첫 번째 세션 다음에 추가하는 경우
+      newDeadline = currentSessions[selectedSession + 1].start_date;
+      newStartDate = new Date(newDeadline);
+      newStartDate.setDate(newStartDate.getDate() - 1);
+      newStartDate = newStartDate.toISOString().split('T')[0];
+    } else {
+      // 중간에 추가하는 경우
+      newStartDate = currentSessions[selectedSession].deadline;
+      newDeadline = currentSessions[selectedSession + 1].start_date;
+    }
+
     const newSession: SessionItem = {
-      seq: Array.isArray(roadmapData.sessionData) ? 
-        roadmapData.sessionData[selectedSession].seq + 1 : 1,
+      seq: currentSessions[selectedSession].seq + 1,
       topic: "새로운 세션",
       description: "설명을 입력하세요",
-      start_date: "2024-04-21",
-      deadline: "2024-04-25",
+      start_date: newStartDate,
+      deadline: newDeadline,
       note: null
     };
     
     setRoadmapData(prev => {
       if (!prev) return null;
-      const currentSessions = Array.isArray(prev.sessionData) ? prev.sessionData : [];
       const updatedSessions = [
         ...currentSessions.slice(0, selectedSession + 1),
         newSession,
@@ -785,6 +812,8 @@ export default function HomePage() {
     setIsEditing(true);
     setEditedTopic("새로운 세션");
     setEditedDescription("설명을 입력하세요");
+    setEditedStartDate(newStartDate);
+    setEditedDeadline(newDeadline);
   };
 
   const handleDeleteRoadmapClick = () => {
@@ -985,7 +1014,17 @@ export default function HomePage() {
                       </span>
                     </>
                   )}
-                  <span onClick={handleDeleteSession}><img src="/icons/delete.svg" alt="delete" /></span>
+                  {roadmapData.sessionData.length > 1 ? (
+                    <span onClick={handleDeleteSession}>
+                      <img src="/icons/delete.svg" alt="delete" />
+                    </span>
+                  ) : (
+                    <DisabledIcon 
+                      onClick={() => showTooltipMessage('마지막 세션은 삭제할 수 없습니다.', true)}
+                    >
+                      <img src="/icons/delete.svg" alt="delete" />
+                    </DisabledIcon>
+                  )}
                 </HeaderIcons>
                 <HeaderTitle>
                   {isEditing ? (
