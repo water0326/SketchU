@@ -118,6 +118,9 @@ const InputWrapper = styled.div<{ $movedUp: boolean }>`
   align-items: center;
   justify-content: center;
   transition: margin 0.6s ease;
+  width: 100%;
+  max-width: 800px;
+  padding: 0 20px;
 
   ${({ $movedUp: movedUp }) =>
     movedUp &&
@@ -133,11 +136,12 @@ const Input = styled.input`
   outline: none;
   font-size: 1.1rem;
   background-color: transparent;
-  width: 774px;
+  min-width: 200px;
   height: 50px;
   background-color: #f6f9f3;
   box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.15);
   padding-left: 20px;
+  padding-right: 20px;
   padding-top: 2px;
 
   &:disabled {

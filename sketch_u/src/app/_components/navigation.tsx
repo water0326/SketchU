@@ -85,7 +85,7 @@ export default function Navigation() {
   return (
     <Container>
       <Logo onClick={handleLogoClick}>
-        <img src="./icons/logo.png" alt="LOGO" />
+        <img src="/icons/logo.png" alt="LOGO" />
       </Logo>
       <Menu>
         {menuItems.map((item, index) => (
