@@ -215,7 +215,24 @@ const Role = styled.span`
   box-shadow: 0 2px 8px rgba(144, 216, 191, 0.3);
 `;
 
-// 개발자 정보 타입 정의
+const LinkButton = styled(Button)`
+  padding: 8px 16px;
+  font-size: 14px;
+  margin-right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  
+  &:last-child {
+    margin-right: 0;
+  }
+`;
+
+const ButtonContainer = styled.div`
+  margin-top: 16px;
+`;
+
+// 개발자 정보 타입 정의 수정
 interface Developer {
   name: string;
   role: string;
@@ -223,10 +240,11 @@ interface Developer {
   contact: {
     github: string;
     email: string;
+    portfolio?: string; // optional portfolio URL
   };
 }
 
-// 개발자 정보를 별도의 데이터로 분리
+// 개발자 정보 데이터 수정
 const developers: Developer[] = [
   {
     name: "김동훈",
@@ -252,12 +270,13 @@ const developers: Developer[] = [
     ],
     contact: {
       github: "water0326",
-      email: "besteunju4@gmail.com"
+      email: "besteunju4@gmail.com",
+      portfolio: "https://zircon-sink-85a.notion.site/10d2f179af5e8091b1a0d339258736d3?v=fff2f179af5e813d87ef000ce3df927b"  // 포트폴리오 URL 추가
     }
   }
 ];
 
-// 개발자 카드 컴포넌트
+// 개발자 카드 컴포넌트 수정
 const DeveloperCard = ({ developer }: { developer: Developer }) => (
   <SettingItem>
     <SettingInfo>
@@ -271,9 +290,22 @@ const DeveloperCard = ({ developer }: { developer: Developer }) => (
         ))}
       </SettingDescription>
       <SettingDescription>
-        • GitHub: @{developer.contact.github}<br />
         • Email: {developer.contact.email}
       </SettingDescription>
+      <ButtonContainer>
+        <LinkButton 
+          onClick={() => window.open(`https://github.com/${developer.contact.github}`, '_blank')}
+        >
+          GitHub
+        </LinkButton>
+        {developer.contact.portfolio && (
+          <LinkButton 
+            onClick={() => window.open(developer.contact.portfolio, '_blank')}
+          >
+            Portfolio
+          </LinkButton>
+        )}
+      </ButtonContainer>
     </SettingInfo>
   </SettingItem>
 );
