@@ -315,7 +315,7 @@ export default function SettingsPage() {
     <Container>
       <ProfileButton />
       <NewRoadmap />
-      <PageName>설정</PageName>
+      <PageName>크레딧</PageName>
       
       <SettingsContainer>
         <Section>

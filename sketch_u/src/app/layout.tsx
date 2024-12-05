@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Sketch U",
   description: "Sketch your roadmap",
   icons: {
-    icon: "/cat.jpg",
+    icon: "/cat.png",
   },
 };
 
