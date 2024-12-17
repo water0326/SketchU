@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     async rewrites() {
-        const destination = 'http://43.201.55.125:8081/api/:path*';
+        const destination = process.env.NEXT_PUBLIC_API_URL + '/:path*';
         
         return [
           {
